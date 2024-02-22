@@ -1,0 +1,32 @@
+@prefix : <http://example.com/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+:ressource1 a rdfs:Resource ;
+	:repository :repo1 ;
+	rdfs:label "RDF Processing Toolkit" ;
+    :label "Up-to-date", "CLI" ;
+    :AKSW "true" ;
+    :usedInProject :STREAM, :Coypu, :KupferDigital ;
+    rdfs:comment "Claus allmächtiges Tool" ;
+    foaf:logo <https://avatars.githubusercontent.com/u/15215821?s=48&v=4> ;
+    dcterms:created "22-02-2024" ;
+    dcterms:modified "22-02-2024" ;
+    :documentationPage <https://smartdataanalytics.github.io/RdfProcessingToolkit/> ;
+    .
+	
+:repo1 a rdfs:Resource ;
+	foaf:page <https://github.com/SmartDataAnalytics/RdfProcessingToolkit> ;
+    :lastCommit "2024-02-22" ;
+    dcterms:modified "22-02-2024" ;
+    dc:description "Command line interface based RDF processing toolkit to run sequences of SPARQL statements ad-hoc on RDF datasets, streams of bindings and streams of named graphs with support for processing JSON, CSV and XML using function extensions" ;
+    :readme """Readme.md content""" ;
+    :mainContributor <https://github.com/Aklakan> ;
+    :latestRelease <https://github.com/SmartDataAnalytics/RdfProcessingToolkit/releases/tag/v1.9.8-rc1> ;
+    :language "Java" ;
+    :meta "4 contributors; 3 forks; 5 PR; 13 issues;" ;
+    dcterms:license "Apache License Version 2.0" ;
+    .
