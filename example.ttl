@@ -8,8 +8,9 @@
 :ressource1 a rdfs:Resource ;
 	:repository :repo1 ;
 	rdfs:label "RDF Processing Toolkit" ;
-    :label "Up-to-date", "CLI" ;
+    :label :label1, :label2 ;
     :AKSW "true" ;
+    :autoUpdate "true" ;
     :usedInProject :STREAM, :Coypu, :KupferDigital ;
     rdfs:comment "Claus allmächtiges Tool" ;
     foaf:logo <https://avatars.githubusercontent.com/u/15215821?s=48&v=4> ;
@@ -29,4 +30,22 @@
     :language "Java" ;
     :meta "4 contributors; 3 forks; 5 PR; 13 issues;" ;
     dcterms:license "Apache License Version 2.0" ;
+    .
+
+:label1 a rdfs:Resource ;
+    rdfs:label "Up-to-date" ;
+    :color "white" ;
+    :group "meta" ;
+    .
+
+:label2 a rdfs:Resource ;
+    rdfs:label "CLI" ;
+    :color "black" ;
+    :group "meta" ;
+    .
+
+:STREAM a rdfs:Resource ;
+    rdfs:label "STREAM" ;
+    foaf:page <https://stream-projekt.net> ;
+    :startDate "01-08-2019" ;
     .

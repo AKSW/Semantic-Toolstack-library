@@ -2,6 +2,7 @@ from github import Github
 import gitlab
 import os
 from pprint import PrettyPrinter
+from urllib.parse import quote
 
 # Replace 'your_github_token' and 'your_gitlab_token' with your actual tokens
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
@@ -20,6 +21,7 @@ def get_github_repo_info(repo_name):
         latest_release_html_url = None
     
     latest_commit = repo.get_commits()[0]
+    last_commit_author_url = latest_commit.author.html_url if latest_commit.author else "No author URL"
     default_branch = repo.default_branch
     contributors_count = repo.get_contributors().totalCount
     open_pull_requests_count = repo.get_pulls(state='open').totalCount
@@ -37,6 +39,7 @@ def get_github_repo_info(repo_name):
         'latest_release_tag': latest_release_tag,
         'latest_release_html_url': latest_release_html_url,
         'last_commit_author': latest_commit.commit.author.name,
+        'last_commit_author_url': last_commit_author_url,
         'last_commit_message': latest_commit.commit.message,
         'last_commit_date': latest_commit.commit.author.date,
         'open_pull_requests_count': open_pull_requests_count,
@@ -49,16 +52,19 @@ def get_gitlab_repo_info(repo_name):
     gl = gitlab.Gitlab(GITLAB_URL, private_token=GITLAB_TOKEN)
     project = gl.projects.get(repo_name)
     releases = None
-    releases = project.releases.list()
-    if releases:
-        latest_release = releases[0]
-        latest_release_tag = latest_release.tag_name
-        latest_release_html_url = latest_release._attrs.get('web_url', None)
-    else:
-        latest_release_tag = "No releases"
-        latest_release_html_url = None
+    latest_release_tag = "No releases"
+    latest_release_html_url = None
+    try:
+        releases = project.releases.list()
+        if releases:
+            latest_release = releases[0]
+            latest_release_tag = latest_release.tag_name
+            latest_release_html_url = latest_release._links.get('self', None)
+    except:
+         print("No releases")
     
     latest_commit = project.commits.list()[0]
+    escapedUserName = quote(latest_commit.author_name)
     open_merge_requests_count = project.mergerequests.list(state='opened').__len__()
     try:
         readme_content = project.files.get(file_path='README.md', ref=project.default_branch).decode()
@@ -73,6 +79,7 @@ def get_gitlab_repo_info(repo_name):
         'latest_release_tag': latest_release_tag,
         'latest_release_html_url': latest_release_html_url,
         'last_commit_author': latest_commit.author_name,
+        'last_commit_author_url': f"https://gitlab.com/search?scope=users&search={escapedUserName}",
         'last_commit_message': latest_commit.message,
         'last_commit_date': latest_commit.committed_date,
         'open_merge_requests_count': open_merge_requests_count,
