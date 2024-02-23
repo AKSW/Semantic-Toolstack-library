@@ -21,7 +21,7 @@ def get_github_repo_info(repo_name):
         latest_release_html_url = None
     
     latest_commit = repo.get_commits()[0]
-    last_commit_author_url = latest_commit.author.html_url if latest_commit.author else "No author URL"
+    last_commit_author_url = latest_commit.author.html_url if latest_commit.author else ""
     default_branch = repo.default_branch
     contributors_count = repo.get_contributors().totalCount
     open_pull_requests_count = repo.get_pulls(state='open').totalCount
@@ -53,7 +53,7 @@ def get_gitlab_repo_info(repo_name):
     project = gl.projects.get(repo_name)
     releases = None
     latest_release_tag = "No releases"
-    latest_release_html_url = None
+    latest_release_html_url = ""
     try:
         releases = project.releases.list()
         if releases:
@@ -82,8 +82,8 @@ def get_gitlab_repo_info(repo_name):
         'last_commit_author_url': f"https://gitlab.com/search?scope=users&search={escapedUserName}",
         'last_commit_message': latest_commit.message,
         'last_commit_date': latest_commit.committed_date,
-        'open_merge_requests_count': open_merge_requests_count,
-        #'owner': project.owner['username'] if project.owner else "No owner information",
+        'open_pull_requests_count': open_merge_requests_count,
+        'owner': "", #project.owner['username'] if project.owner else "No owner information", # owner attribut not existing
         'number_of_issues': project.open_issues_count,
         'readme_content': readme_content,
     }
