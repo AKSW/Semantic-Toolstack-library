@@ -4,8 +4,15 @@ This is the code for the library of semantic tools which is updated automaticall
 
 Its docker based.
 
-## Python libraries
+## Web GUI
 
-* RDFlib
-* PyGithub
-* python-gitlab
+Under folder webui.
+
+## Middleware
+
+Under folder service.
+
+## Database
+
+Fuseki triple store
+
