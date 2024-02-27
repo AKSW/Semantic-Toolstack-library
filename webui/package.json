@@ -9,8 +9,12 @@
   },
   "dependencies": {
     "@mdi/font": "7.0.96",
+    "@tpluscode/sparql-builder": "^0.3.31",
+    "@zazuko/prefixes": "^2.2.0",
     "core-js": "^3.34.0",
+    "isomorphic-fetch": "^3.0.0",
     "roboto-fontface": "*",
+    "uuid": "^9.0.1",
     "vue": "^3.3.0",
     "vuetify": "^3.0.0"
   },
