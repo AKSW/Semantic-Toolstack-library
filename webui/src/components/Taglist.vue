@@ -7,6 +7,7 @@
         v-for="(item, i) in items"
         :key="i"
         :value="item"
+        @click="open(item)"
       >
         <template v-slot:prepend>
           <div :style="{ backgroundColor: item.color }" class="colorbox">
@@ -21,6 +22,7 @@
 
 <script>
   import { readResources } from '@/utils/helper';
+  import { useRouteDataStore } from '@/store/app'
 
   export default {
     data: () => ({
@@ -49,6 +51,15 @@
           console.error("There was an error fetching the data:", error);
         }
       },
+      open(item) {
+        console.log(item);
+
+        const store = useRouteDataStore()
+        store.setData(item)
+
+        // Assuming you're using Vue Router for navigation
+        this.$router.push({ path: '/addTag' });
+      }
     },
   }
 </script>
