@@ -1,5 +1,8 @@
 <template>
   <v-sheet width="90%" class="mx-auto">
+    <h1>
+      Add new Tool
+    </h1>
     <v-form fast-fail @submit.prevent>
       <v-text-field
         v-model="rdfsxXXXxlabel"
@@ -57,7 +60,28 @@
         :rules="repoURLRule"
       ></v-text-field>
 
-      <v-btn type="submit" block class="mt-2">Submit</v-btn>
+      <v-btn
+        type="submit"
+        block
+        class="mt-2"
+        prepend-icon="mdi-check-circle">
+        <template v-slot:prepend>
+          <v-icon color="success"></v-icon>
+        </template>
+        Submit
+      </v-btn>
+      <br>
+      <v-btn
+        variant="tonal"
+        block
+        color="red"
+        prepend-icon="mdi-cancel"
+        @click="goBack">
+        <template v-slot:prepend>
+          <v-icon color="cancel"></v-icon>
+        </template>
+        Cancel
+      </v-btn>
     </v-form>
   </v-sheet>
 </template>
@@ -83,5 +107,14 @@
       foafxXXXxlogo: "",
       infai_vxXXXxdocumentationPage: "",
     }),
+    setup() {
+      const router = useRouter();
+
+      function goBack() {
+        router.back();
+      }
+
+      return { goBack };
+    },
   }
 </script>

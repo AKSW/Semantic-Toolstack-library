@@ -14,7 +14,7 @@
     <v-btn
       prepend-icon="mdi-plus"
       block
-      @click="redirectToPage"
+      @click="redirectToPage(tab)"
     >
       <template v-slot:prepend>
         <v-icon></v-icon>
@@ -52,9 +52,20 @@
     setup() {
       const router = useRouter()
 
-      function redirectToPage() {
-        // Replace '/your-path' with the path you want to navigate to
-        router.push('/addproject')
+      function redirectToPage(tab) {
+        var path = "";
+        switch (tab) {
+          case "tools":
+            path = "/addTool";
+            break;
+          case "tags":
+            path = "/addTag";
+            break;
+          case "projects":
+            path = "/addProject";
+            break;
+        }
+        router.push(path)
       }
 
       return { redirectToPage }
