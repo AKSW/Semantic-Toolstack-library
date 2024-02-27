@@ -1,10 +1,5 @@
 <template>
   <v-card color="basil">
-    <v-card-title class="text-center justify-center py-6">
-      <h1 class="font-weight-bold text-h2 text-basil">
-        Semantic Toolstack Library
-      </h1>
-    </v-card-title>
     <v-tabs
       v-model="tab"
       bg-color="transparent"
@@ -19,6 +14,7 @@
     <v-btn
       prepend-icon="mdi-plus"
       block
+      @click="redirectToPage"
     >
       <template v-slot:prepend>
         <v-icon></v-icon>
@@ -45,11 +41,23 @@
 </template>
 
 <script>
+  import { useRoute, useRouter } from 'vue-router'
+
   export default {
     data () {
       return {
         tab: "tools",
       }
+    },
+    setup() {
+      const router = useRouter()
+
+      function redirectToPage() {
+        // Replace '/your-path' with the path you want to navigate to
+        router.push('/addproject')
+      }
+
+      return { redirectToPage }
     },
   }
 </script>
