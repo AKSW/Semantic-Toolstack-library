@@ -24,12 +24,25 @@ export function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+export function transformDateStringToLiteral(dateAsString) {
+  const date = new Date(dateAsString);
+  return (parseInt(date.getMonth())+1)+"-"+date.getDay()+"-"+date.getFullYear();
+}
+
+export function transformLiteralToDateString(literal) {
+  const date = new Date(literal);
+  return date.toISOString().substring(0, 10);
+}
+
 // CREATE
 // create resource
 export function createResource(type, data) {
   switch (type) {
     case 'tag':
       return createTag(data)
+      break;
+    case 'project':
+      return createProject(data)
       break;
 
     default:
@@ -54,6 +67,30 @@ async function createTag(tag) {
       ${rdfs.label} "${tag.label}" ;
       ${infai_v.color} "${tag.color}" ;
       ${infai_v.group} "${tag.group}"
+      .
+    `
+      .build();
+  console.log("query: ", query)
+  var response = await executeSparqlUpdate(query)
+  return response;
+}
+
+/*
+Insert data {
+  infai_d:STREAM a rdfs:Resource ;
+    rdfs:label "STREAM" ;
+    foaf:page <http...> ;
+    infai_v:startDate "2024" ;
+    .
+}
+*/
+async function createProject(project) {
+  const resource = "http://infai.org/data/semantictoolstack/"+uuidv4();
+  var query =
+    await INSERT.DATA`<${resource}> a ${rdfs.Resource} ;
+      ${rdfs.label} "${project.label}" ;
+      ${foaf.page} <${project.page}> ;
+      ${infai_v.startDate} "${project.startDate}"
       .
     `
       .build();
@@ -89,6 +126,9 @@ export function readResources(type) {
     case 'tags':
       return readTags()
       break;
+    case 'projects':
+      return readProjects()
+      break;
 
     default:
       return null;
@@ -119,7 +159,37 @@ async function readTags() {
         ${infai_v.color} ${color} ;
         ${infai_v.group} ${group} ;
         .
-        FILTER ( ?label != "" )`
+        FILTER ( ${label} != "" )`
+      .build();
+  console.log("query: ", query)
+  var response = await executeSparqlQuery(query)
+  return response.results.bindings;
+}
+
+/*
+SELECT *
+WHERE {
+  ?project a rdfs:Resource ;
+  	rdfs:label ?label ;
+    foaf:page ?page ;
+    infai_v:startDate ?startDate ;
+    .
+  	FILTER ( ?label != "" )
+}
+*/
+async function readProjects() {
+  const project = variable('project')
+  const label = variable('label')
+  const page = variable('page')
+  const startDate = variable('startDate')
+  var query =
+    await SELECT`${project} ${label} ${page} ${startDate}`
+      .WHERE`${project} a ${rdfs.Resource} ;
+        ${rdfs.label} ${label} ;
+        ${foaf.page} ${page} ;
+        ${infai_v.startDate} ${startDate} ;
+        .
+        FILTER ( ${label} != "" )`
       .build();
   console.log("query: ", query)
   var response = await executeSparqlQuery(query)
@@ -153,6 +223,9 @@ export function deleteResource(type, data) {
   switch (type) {
     case 'tag':
       return deleteTag(data)
+      break;
+    case 'project':
+      return deleteProject(data)
       break;
 
     default:
@@ -195,6 +268,46 @@ async function deleteTag(tagObject) {
       ${infai_v.group} ${group}
       .
       FILTER( ${tag} = <${iri}> )`
+    .build();
+  console.log("update: ", query)
+  var response = await executeSparqlUpdate(query)
+  return response;
+}
+
+/*
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX infai_v: <http://infai.org/vocabs/semantictoolstack/>
+
+delete {
+	?project a rdfs:Resource;
+      rdfs:label ?label ;
+      foaf:page ?page ;
+      infai_v:startDate ?startDate ;
+      .
+}
+WHERE {
+  FILTER ( ?project = <http://infai.org/data/semantictoolstack/69c081e9-b26c-46c5-b223-95907b2433ce> )
+}
+*/
+async function deleteProject(projectObject) {
+  const iri = projectObject.id;
+  const project = variable('project')
+  const label = variable('label')
+  const page = variable('page')
+  const startDate = variable('startDate')
+  var query =
+    await DELETE`${project} a ${rdfs.Resource} ;
+      ${rdfs.label} ${label} ;
+      ${foaf.page} ${page} ;
+      ${infai_v.startDate} ${startDate}
+      .
+    `
+    .WHERE`${project} a ${rdfs.Resource} ;
+      ${rdfs.label} ${label} ;
+      ${foaf.page} ${page} ;
+      ${infai_v.startDate} ${startDate}
+      .
+      FILTER( ${project} = <${iri}> )`
     .build();
   console.log("update: ", query)
   var response = await executeSparqlUpdate(query)

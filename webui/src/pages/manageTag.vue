@@ -8,7 +8,7 @@
   </v-alert>
   <v-sheet width="90%" class="mx-auto">
     <h1>
-      Add new Tag
+      Manage Tag
     </h1>
     <tag-form
       ref="childFormRef"

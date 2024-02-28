@@ -30,11 +30,11 @@
         </v-window-item>
 
         <v-window-item value="#tags">
-          <Taglist />
+          <Taglist @update:hash="removeHash" />
         </v-window-item>
 
         <v-window-item value="#projects">
-          projects
+          <Projectlist @update:hash="removeHash" />
         </v-window-item>
       </v-window>
     </v-card-text>
@@ -74,17 +74,20 @@
         var path = "";
         switch (this.tab) {
           case "#tools":
-            path = "/addTool";
+            path = "/manageTool";
             break;
           case "#tags":
-            path = "/addTag";
+            path = "/manageTag";
             break;
           case "#projects":
-            path = "/addProject";
+            path = "/manageProject";
             break;
         }
-        this.tab = '';
+        this.removeHash();
         router.push(path)
+      },
+      removeHash() {
+        this.tab = '';
       },
     },
   }

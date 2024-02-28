@@ -10,6 +10,7 @@ export const useAppStore = defineStore('app', {
 export const useRouteDataStore = defineStore('routeData', {
   state: () => ({
     tag: {},
+    project: {},
   }),
   actions: {
     setTag(tag) {
@@ -17,6 +18,12 @@ export const useRouteDataStore = defineStore('routeData', {
     },
     clearTag() {
       this.tag = {}
-    }
+    },
+    setProject(project) {
+      this.project = project
+    },
+    clearProject() {
+      this.project = {}
+    },
   }
 })

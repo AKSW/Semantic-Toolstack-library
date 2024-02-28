@@ -9,12 +9,12 @@
         :value="item"
         @click="open(item)"
       >
-        <template v-slot:prepend>
-          <div :style="{ backgroundColor: item.color }" class="colorbox">
-          </div>
-        </template>
-        <v-list-item-title v-text="item.label"></v-list-item-title>
-        Group: {{item.group}}
+        <v-list-item-title>
+          <a :href="item.page" target="_blank">
+            {{item.label}}
+          </a>
+        </v-list-item-title>
+        Start date: {{item.startDate}}
       </v-list-item>
     </v-list>
   </v-card>
@@ -23,7 +23,7 @@
 <script>
   import { readResources } from '@/utils/helper';
   import { useRouteDataStore } from '@/store/app'
-  import { Tag } from '@/models/Tag'
+  import { Project } from '@/models/Project'
 
   export default {
     data: () => ({
@@ -35,9 +35,9 @@
     methods: {
       async fetchData() {
         try {
-          const data = await readResources("tags");
+          const data = await readResources("projects");
           console.log("Data return: ", data, "type:", typeof data);
-          this.items = Tag.transformFromSPARQL(data); // Update the items data property with the response
+          this.items = Project.transformFromSPARQL(data); // Update the items data property with the response
         } catch (error) {
           console.error("There was an error fetching the data:", error);
         }
@@ -46,10 +46,10 @@
         console.log(item);
 
         const store = useRouteDataStore()
-        store.setTag(item)
+        store.setProject(item)
 
         this.$emit('update:hash');
-        this.$router.push('/manageTag');
+        this.$router.push('/manageProject');
       }
     },
   }
