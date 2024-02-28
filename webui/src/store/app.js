@@ -9,14 +9,14 @@ export const useAppStore = defineStore('app', {
 
 export const useRouteDataStore = defineStore('routeData', {
   state: () => ({
-    data: {}, // This will hold the data you want to pass between components
+    tag: {},
   }),
   actions: {
-    setData(data) {
-      this.data = data
+    setTag(tag) {
+      this.tag = tag
     },
-    clearData() {
-      this.data = {}
+    clearTag() {
+      this.tag = {}
     }
   }
 })

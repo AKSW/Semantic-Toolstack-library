@@ -4,13 +4,13 @@
     :title="alertTitle"
     v-model="showAlert"
   >
-    Tag "{{ rdfsxXXXxlabel }}" in group "{{ infai_vxXXXxgroup }}" and hex color {{ infai_vxXXXxcolor }}
+    Tag "{{ newTag.label }}" in group "{{ newTag.group }}" and hex color {{ newTag.color }}
   </v-alert>
   <v-sheet width="90%" class="mx-auto">
     <h1>
       Add new Tag
     </h1>
-    <tag-form ref="childFormRef" :initial-form-data="parentFormData"></tag-form>
+    <tag-form ref="childFormRef"></tag-form>
     <v-btn
       block
       class="mt-2"
@@ -38,20 +38,14 @@
 
 <script>
   import { createResource } from '@/utils/helper';
-  import { useRouteDataStore } from '@/store/app'
-
-  var delimiter = "xXXXx";
 
   export default {
     data: () => ({
-      parentFormData: {},//changing this will result in an update on the TagForm form
       showAlert: false,
       alertType: "success",
       alertTitle: "Tag was added",
+      newTag: {},
     }),
-    mounted() {
-      this.fetchData();
-    },
     setup() {
       const router = useRouter();
 
@@ -62,20 +56,11 @@
       return { goBack };
     },
     methods: {
-      fetchData() {
-        const store = useRouteDataStore()
-        console.log(store.data)
-        this.parentFormData = store.data;
-        this.$refs.childFormRef.updateFormData(this.parentFormData)
-      },
       save() {
-        var data = {};
-        Object.entries(this.$refs.childFormRef.getFormData()).forEach(([key, value]) => {
-          var keyAsIRI = key.replace(delimiter, ":");
-          data[keyAsIRI] = value;
-        });
-        console.log("data: ", data);
-        var response = createResource("tag", data);
+        const tag = this.$refs.childFormRef.getTag();
+        console.log("tag: ", tag);
+        this.newTag = tag;
+        var response = createResource("tag", tag);
 
         // handle
         if (typeof response !== typeof "string") {//should be the other way around but does not work
@@ -93,6 +78,7 @@
         // Set a timer to hide the alert after 10 seconds
         setTimeout(() => {
           this.showAlert = false;
+          this.newTag = {};
         }, 10000);
       },
     },

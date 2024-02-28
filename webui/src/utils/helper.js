@@ -17,6 +17,9 @@ const rdfs = namespace(prefixes.rdfs)
 
 const endpoint = "http://localhost:3030/resources/";
 
+const delimiter = "xXXXx";
+export { delimiter };
+
 // A sample helper function
 export function formatDate(date) {
   return new Date(date).toLocaleDateString();
@@ -49,13 +52,13 @@ Insert data {
     .
 }
 */
-async function createTag(data) {
+async function createTag(tag) {
   const resource = "http://infai.org/data/semantictoolstack/"+uuidv4();
   var query =
     await INSERT.DATA`<${resource}> a ${rdfs.Resource} ;
-      ${rdfs.label} "${data["rdfs:label"]}" ;
-      ${infai_v.color} "${data["infai_v:color"]}" ;
-      ${infai_v.group} "${data["infai_v:group"]}"
+      ${rdfs.label} "${tag.label}" ;
+      ${infai_v.color} "${tag.color}" ;
+      ${infai_v.group} "${tag.group}"
       .
     `
       .build();

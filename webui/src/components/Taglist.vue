@@ -23,13 +23,11 @@
 <script>
   import { readResources } from '@/utils/helper';
   import { useRouteDataStore } from '@/store/app'
+  import { Tag } from '@/models/Tag'
 
   export default {
     data: () => ({
-      items: [
-        { tag: '1', color: '#000000', label: "CLI", group: "test" },
-        { tag: '2', color: '#FFFFFF', label: "Other", group: "test" },
-      ],
+      items: [],
     }),
     created() {
       this.fetchData();
@@ -39,14 +37,7 @@
         try {
           const data = await readResources("tags");
           console.log("Data return: ", data, "type:", typeof data);
-          const modifiedData = data.map(item => {
-            const newItem = {};
-            Object.keys(item).forEach(key => {
-                newItem[key] = item[key].value;
-            });
-            return newItem;
-          }).sort((a, b) => a.label.localeCompare(b.label));
-          this.items = modifiedData; // Update the items data property with the response
+          this.items = Tag.transformFromSPARQL(data); // Update the items data property with the response
         } catch (error) {
           console.error("There was an error fetching the data:", error);
         }
@@ -55,7 +46,7 @@
         console.log(item);
 
         const store = useRouteDataStore()
-        store.setData(item)
+        store.setTag(item)
 
         // Assuming you're using Vue Router for navigation
         this.$router.push({ path: '/addTag' });
