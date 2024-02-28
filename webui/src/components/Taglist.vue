@@ -49,7 +49,7 @@
         store.setTag(item)
 
         // Assuming you're using Vue Router for navigation
-        this.$router.push({ path: '/addTag' });
+        this.$router.push({ path: '/addTag', hash: '' });
       }
     },
   }

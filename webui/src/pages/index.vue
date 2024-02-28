@@ -15,7 +15,7 @@
     <v-btn
       prepend-icon="mdi-plus"
       block
-      @click="redirectToPage(tab)"
+      @click="redirectToPage"
     >
       <template v-slot:prepend>
         <v-icon></v-icon>
@@ -42,8 +42,6 @@
 </template>
 
 <script>
-  import { useRoute, useRouter } from 'vue-router'
-
   export default {
     data () {
       return {
@@ -71,27 +69,23 @@
       onTabChange(newVal) {
         this.tab = String(newVal);
       },
-    },
-    setup() {
-      const router = useRouter()
-
-      function redirectToPage(tab) {
+      redirectToPage() {
+        const router = this.$router;
         var path = "";
-        switch (tab) {
-          case "tools":
+        switch (this.tab) {
+          case "#tools":
             path = "/addTool";
             break;
-          case "tags":
+          case "#tags":
             path = "/addTag";
             break;
-          case "projects":
+          case "#projects":
             path = "/addProject";
             break;
         }
+        this.tab = '';
         router.push(path)
-      }
-
-      return { redirectToPage }
+      },
     },
   }
 </script>

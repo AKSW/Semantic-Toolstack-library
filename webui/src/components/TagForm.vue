@@ -29,7 +29,7 @@
           label: '',
           color: "",
           group: "",
-          tag: "",
+          id: "",
         }),
       },
     },
@@ -38,15 +38,16 @@
         label: '',
         color: "",
         group: "",
-        tag: "",
+        id: "",
       }
     }),
     methods: {
       getTag() {
-        return new Tag(this.formdata.label, this.formdata.color, this.formdata.group, this.formdata.tag);
+        return new Tag(this.formdata.label, this.formdata.color, this.formdata.group, this.formdata.id);
       },
       updateFormData(newData) {
         this.formdata = { ...newData };
+        this.$emit('update:formdata', newData);
       },
     },
     mounted() {
@@ -58,6 +59,12 @@
       }
       else
         this.updateFormData(this.initialFormData); // Initialize formdata
+    },
+    watch: {
+      formdata(newData) {
+        // Emit an event whenever formdata changes
+        this.$emit('update:formdata', newData);
+      }
     },
   }
 </script>

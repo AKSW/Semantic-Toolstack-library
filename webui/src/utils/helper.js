@@ -3,11 +3,10 @@
 import { variable } from '@rdfjs/data-model'
 import namespace from '@rdfjs/namespace'
 import prefixes from '@zazuko/prefixes/prefixes'
-//import expand from '@zazuko/prefixes/expand'
-import { INSERT, SELECT } from '@tpluscode/sparql-builder'
+import { INSERT, SELECT, DELETE } from '@tpluscode/sparql-builder'
 import { v4 as uuidv4 } from 'uuid';
-//import fetch from 'isomorphic-fetch'
 
+// Namespaces
 const infai_v = namespace('http://infai.org/vocabs/semantictoolstack/')
 const infai_d = namespace('http://infai.org/data/semantictoolstack/')
 const foaf = namespace(prefixes.foaf)
@@ -15,21 +14,17 @@ const dc = namespace(prefixes.dc)
 const dcterms = namespace(prefixes.dcterms)
 const rdfs = namespace(prefixes.rdfs)
 
+// Constants
 const endpoint = "http://localhost:3030/resources/";
-
 const delimiter = "xXXXx";
 export { delimiter };
-
-// A sample helper function
-export function formatDate(date) {
-  return new Date(date).toLocaleDateString();
-}
 
 // Another helper function
 export function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+// CREATE
 // create resource
 export function createResource(type, data) {
   switch (type) {
@@ -88,6 +83,7 @@ async function executeSparqlUpdate(query) {
   }
 }
 
+// READ
 export function readResources(type) {
   switch (type) {
     case 'tags':
@@ -149,4 +145,58 @@ async function executeSparqlQuery(query) {
       console.error("Error fetching data: ", error);
       return error;
   }
+}
+
+// DELETE
+// delete resource
+export function deleteResource(type, data) {
+  switch (type) {
+    case 'tag':
+      return deleteTag(data)
+      break;
+
+    default:
+      return null;
+      break;
+  }
+}
+
+/*
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX infai_v: <http://infai.org/vocabs/semantictoolstack/>
+
+delete {
+	?tag a rdfs:Resource;
+      rdfs:label ?label ;
+      infai_v:color ?color ;
+      infai_v:group ?group ;
+      .
+}
+WHERE {
+  FILTER ( ?tag = <http://infai.org/data/semantictoolstack/69c081e9-b26c-46c5-b223-95907b2433ce> )
+}
+*/
+async function deleteTag(tagObject) {
+  const iri = tagObject.id;
+  const tag = variable('tag')
+  const label = variable('label')
+  const color = variable('color')
+  const group = variable('group')
+  var query =
+    await DELETE`${tag} a ${rdfs.Resource} ;
+      ${rdfs.label} ${label} ;
+      ${infai_v.color} ${color} ;
+      ${infai_v.group} ${group}
+      .
+    `
+    .WHERE`${tag} a ${rdfs.Resource} ;
+      ${rdfs.label} ${label} ;
+      ${infai_v.color} ${color} ;
+      ${infai_v.group} ${group}
+      .
+      FILTER( ${tag} = <${iri}> )`
+    .build();
+  console.log("update: ", query)
+  var response = await executeSparqlUpdate(query)
+  return response;
 }
