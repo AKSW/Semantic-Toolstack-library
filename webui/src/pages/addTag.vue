@@ -98,26 +98,28 @@
         // Show the alert
         this.showAlert = true;
 
-        // Set a timer to hide the alert after 10 seconds
+        // Set a timer to hide the alert after 5 seconds
         setTimeout(() => {
           this.showAlert = false;
           this.newTag = {};
           this.goBack();
-        }, 10000);
+        }, 5000);
       },
       save() {
         const tag = this.$refs.childFormRef.getTag();
         console.log("tag: ", tag);
         this.newTag = tag;
-        var response;
-        if (tag.id == '')
+        var response = "";
+        if (tag.id !== '')
           response = deleteResource("tag", tag);
-        resource = createResource("tag", tag);
+        response = createResource("tag", tag);
 
         // handle
         if (typeof response !== typeof "string") {//should be the other way around but does not work
           this.alertType = "success";
           this.alertTitle = "Tag was added";
+          if (tag.id !== '')
+            this.alertTitle = "Tag was updated";
         }
         else {
           this.alertType = "error";
@@ -127,11 +129,12 @@
         // Show the alert
         this.showAlert = true;
 
-        // Set a timer to hide the alert after 10 seconds
+        // Set a timer to hide the alert after 5 seconds
         setTimeout(() => {
           this.showAlert = false;
           this.newTag = {};
-        }, 10000);
+          this.goBack();
+        }, 5000);
       },
     },
   }
