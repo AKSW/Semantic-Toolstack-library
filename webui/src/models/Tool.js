@@ -41,7 +41,7 @@ export class Tool {
     const modifiedData = response.map(item => {
       return new Tool(
         item.label.value,
-        item.repositoryIRI.value,
+        item.repositoryURL.value,
         item.tags.value.split(", "),
         item.aksw.value === 'true',
         item.autoUpdate.value === 'true',
@@ -52,7 +52,7 @@ export class Tool {
         item.modified.value,
         item.documentationPage.value,
         item.tool.value,
-        item.repositoryURL.value,
+        item.repositoryIRI.value,
       );
     }).sort((a, b) => a.label.localeCompare(b.label));
     return modifiedData;

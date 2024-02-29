@@ -1,8 +1,8 @@
 from github import Github
 import gitlab
+from urllib.parse import urlparse, urlunparse, quote
 import os
 from pprint import PrettyPrinter
-from urllib.parse import quote
 
 # Replace 'your_github_token' and 'your_gitlab_token' with your actual tokens
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
@@ -11,7 +11,7 @@ GITLAB_URL = 'https://gitlab.com'
 
 def get_github_repo_info(repo_name):
     g = Github(GITHUB_TOKEN)
-    repo = g.get_repo(repo_name)
+    repo = g.get_repo(remove_last_two_paths_if_tree(repo_name))
     try:
         latest_release = repo.get_latest_release()
         latest_release_tag = latest_release.tag_name
@@ -47,6 +47,25 @@ def get_github_repo_info(repo_name):
         'number_of_issues': repo.open_issues_count,
         'readme_content': readme_content,
     }
+
+def remove_last_two_paths_if_tree(url):
+    # Parse the URL into components
+    parsed_url = urlparse(url)
+    # Split the path into segments
+    path_segments = parsed_url.path.split('/')
+    
+    # Check if the penultimate segment is 'tree'
+    if len(path_segments) >= 3 and path_segments[-2] == 'tree':
+        # Remove the last two segments
+        new_path = '/'.join(path_segments[:-2])
+        # Reconstruct the URL without the last two segments
+        new_url = urlunparse(
+            (parsed_url.scheme, parsed_url.netloc, new_path, '', '', '')
+        )
+        return new_url
+    else:
+        # Return the original URL if it doesn't end with '/tree/'
+        return url
 
 def get_gitlab_repo_info(repo_name):
     gl = gitlab.Gitlab(GITLAB_URL, private_token=GITLAB_TOKEN)

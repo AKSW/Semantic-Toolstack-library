@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 app = FastAPI()
 
 # Specify the SPARQL endpoint URL
-sparql_endpoint = "http://localhost:3030/default/"
+sparql_endpoint = "http://localhost:3030/resources/"
 
 # Initialize SPARQLWrapper with the endpoint URL
 sparql = SPARQLWrapper(sparql_endpoint)
@@ -27,7 +27,7 @@ ns["infai_v"] = Namespace("http://infai.org/vocabs/semantictoolstack/")
 ns["infai_d"] = Namespace("http://infai.org/data/semantictoolstack/")
 
 @app.get("/updateRepoData/")
-async def get_iri(iri: str):
+async def updateRepoData(iri: str):
     """
     A route that accepts an IRI as a query parameter. The IRI is the the repository resource.
     Example usage: /updateRepoData/?iri=http%3A%2F%2Fexample.com%2F%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82
@@ -58,6 +58,8 @@ async def get_iri(iri: str):
     g.add((URIRef(decoded_iri), ns["infai_v"]["readme"], Literal(repoData["readme_content"])))
     if "last_commit_author_url" in repoData and repoData["last_commit_author_url"]:
         g.add((URIRef(decoded_iri), ns["infai_v"]["mainContributorIRI"], URIRef(repoData["last_commit_author_url"])))
+    else:
+        g.add((URIRef(decoded_iri), ns["infai_v"]["mainContributorIRI"], URIRef("https://aksw.org/Team.html")))
     g.add((URIRef(decoded_iri), ns["infai_v"]["mainContributor"], Literal(repoData["last_commit_author"])))
     g.add((URIRef(decoded_iri), ns["infai_v"]["latestRelease"], URIRef(repoData["latest_release_html_url"])))
     g.add((URIRef(decoded_iri), ns["infai_v"]["language"], Literal(repoData["language"])))
