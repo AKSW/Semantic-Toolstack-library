@@ -11,17 +11,18 @@
       :rules="URLRule"
     ></v-text-field>
 
-    <v-date-picker
-      show-adjacent-months
-      title="Start date"
-      v-model="startDate"></v-date-picker>
+    <v-text-field
+      v-model="formdata.startDate"
+      label="Start date"
+      :rules="[dateValidator]"
+      placeholder="YYYY-MM-DD or empty"
+    ></v-text-field>
   </v-form>
 </template>
 
 <script>
   import { useRouteDataStore } from '@/store/app'
   import { Project } from '@/models/Project'
-  import { transformDateStringToLiteral, transformLiteralToDateString } from '@/utils/helper';
 
   export default {
     props: {
@@ -42,7 +43,6 @@
         startDate: "",
         id: "",
       },
-      startDate: null,
       URLRule: [
         v => !!v || 'URL is required', // Checks if the value is not empty
         v => /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/.test(v) || 'Please enter a valid URL',
@@ -52,11 +52,19 @@
       getProject() {
         return new Project(this.formdata.label, this.formdata.page, this.formdata.startDate, this.formdata.id);
       },
+      dateValidator(value) {
+        if (!value) return true;
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (regex.test(value)) {
+          const date = new Date(value);
+          const dateIsoString = date.toISOString().substring(0, 10);
+          return value === dateIsoString;
+        }
+        return false;
+      },
       updateFormData(newData) {
         this.formdata = { ...newData };
         this.$emit('update:formdata', newData);
-        if (newData.startDate && newData.startDate !== "")
-          this.startDate = transformLiteralToDateString(newData.startDate);
       },
     },
     mounted() {
@@ -73,11 +81,6 @@
       formdata(newData) {
         // Emit an event whenever formdata changes
         this.$emit('update:formdata', newData);
-      },
-      startDate(dateAsString) {
-        console.log("New startDate: ", dateAsString);
-        if (dateAsString && dateAsString !== "")
-          this.formdata.startDate = transformDateStringToLiteral(dateAsString);
       },
     },
   }

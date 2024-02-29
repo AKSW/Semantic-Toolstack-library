@@ -24,16 +24,6 @@ export function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export function transformDateStringToLiteral(dateAsString) {
-  const date = new Date(dateAsString);
-  return (parseInt(date.getMonth())+1)+"-"+date.getDay()+"-"+date.getFullYear();
-}
-
-export function transformLiteralToDateString(literal) {
-  const date = new Date(literal);
-  return date.toISOString().substring(0, 10);
-}
-
 // CREATE
 // create resource
 export function createResource(type, data) {
