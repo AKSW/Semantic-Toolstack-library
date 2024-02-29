@@ -107,13 +107,16 @@ Insert data {
     dcterms:modified "22-02-2024" ;
     infai_v:documentationPage <https://smartdataanalytics.github.io/RdfProcessingToolkit/> ;
     .
+  infai_d:repo1 a rdfs:Resource ;
+	  foaf:page <https://github.com/SmartDataAnalytics/RdfProcessingToolkit> ;
+    .
 }
 */
 async function createTool(tool) {
   const resource = "http://infai.org/data/semantictoolstack/"+uuidv4();
   var query =
     await INSERT.DATA`<${resource}> a ${rdfs.Resource} ;
-      ${infai_v.repository} <${tool.repository.iri}> ;
+      ${infai_v.repository} <${tool.repository.id}> ;
       ${rdfs.label} "${tool.label}" ;
       ${infai_v.tag} ${"<"+tool.tags.join(">, <")+">"} ;
       ${infai_v.AKSW} ${tool.aksw} ;
@@ -125,6 +128,9 @@ async function createTool(tool) {
       ${dcterms.modified} "${tool.modified}" ;
       ${infai_v.documentationPage} <${tool.documentationPage}> ;
       .
+      <${tool.repository.id}> a ${rdfs.Resource} ;
+        ${foaf.page} <${tool.repository.page}> ;
+        .
     `
       .build();
   console.log("query: ", query)
@@ -233,10 +239,10 @@ async function readProjects() {
 }
 
 /*
-SELECT ?tool ?repositoryURL ?label (GROUP_CONCAT(?tag; SEPARATOR=", ") as ?tags) ?aksw ?autoUpdate (GROUP_CONCAT(?project; SEPARATOR=", ") as ?projects) ?comment ?logo ?created ?modified ?documentationPage
+SELECT ?tool ?repositoryIRI ?repositoryURL ?label (GROUP_CONCAT(?tag; SEPARATOR=", ") as ?tags) ?aksw ?autoUpdate (GROUP_CONCAT(?project; SEPARATOR=", ") as ?projects) ?comment ?logo ?created ?modified ?documentationPage
 WHERE {
   ?tool a rdfs:Resource ;
-  	infai_v:repository ?repositoryURL ;
+  	infai_v:repository ?repositoryIRI ;
     rdfs:label ?label ;
     infai_v:tag ?tag ;
     infai_v:AKSW ?aksw ;
@@ -249,11 +255,15 @@ WHERE {
     infai_v:documentationPage ?documentationPage ;
     .
   	FILTER ( ?label != "" )
+    ?repositoryIRI a rdfs:Resource ;
+      foaf:page ?repositoryURL ;
+    .
 }
-group by ?tool ?repositoryURL ?label ?aksw ?autoUpdate ?comment ?logo ?created ?modified ?documentationPage
+group by ?tool ?repositoryIRI ?repositoryURL ?label ?aksw ?autoUpdate ?comment ?logo ?created ?modified ?documentationPage
 */
 async function readTools() {
   const tool = variable('tool')
+  const repositoryIRI = variable('repositoryIRI')
   const repositoryURL = variable('repositoryURL')
   const label = variable('label')
   const tag = variable('tag')
@@ -268,9 +278,9 @@ async function readTools() {
   const modified = variable('modified')
   const documentationPage = variable('documentationPage')
   var query =
-    await SELECT`${tool} ${repositoryURL} ${label} (GROUP_CONCAT(DISTINCT ${tag}; SEPARATOR=", ") as ${tags}) ${aksw} ${autoUpdate} (GROUP_CONCAT(DISTINCT ${project}; SEPARATOR=", ") as ${projects}) ${comment} ${logo} ${created} ${modified} ${documentationPage}`
+    await SELECT`${tool} ${repositoryIRI} ${repositoryURL} ${label} (GROUP_CONCAT(DISTINCT ${tag}; SEPARATOR=", ") as ${tags}) ${aksw} ${autoUpdate} (GROUP_CONCAT(DISTINCT ${project}; SEPARATOR=", ") as ${projects}) ${comment} ${logo} ${created} ${modified} ${documentationPage}`
       .WHERE`${tool} a ${rdfs.Resource} ;
-        ${infai_v.repository} ${repositoryURL} ;
+        ${infai_v.repository} ${repositoryIRI} ;
         ${rdfs.label} ${label} ;
         ${infai_v.tag} ${tag} ;
         ${infai_v.AKSW} ${aksw} ;
@@ -282,8 +292,11 @@ async function readTools() {
         ${dcterms.modified} ${modified} ;
         ${infai_v.documentationPage} ${documentationPage} ;
         .
+        ${repositoryIRI} a ${rdfs.Resource} ;
+          ${foaf.page} ${repositoryURL} ;
+          .
         FILTER ( ${label} != "" )`
-      .GROUP().BY`${tool}) (${repositoryURL}) (${label}) (${aksw}) (${autoUpdate}) (${comment}) (${logo}) (${created}) (${modified}) (${documentationPage}`
+      .GROUP().BY`${tool}) (${repositoryIRI}) (${repositoryURL}) (${label}) (${aksw}) (${autoUpdate}) (${comment}) (${logo}) (${created}) (${modified}) (${documentationPage}`
       .build();
   console.log("query: ", query)
   var response = await executeSparqlQuery(query)
@@ -494,7 +507,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 
 delete {
 	?tool a rdfs:Resource ;
-  	infai_v:repository ?repositoryURL ;
+  	infai_v:repository ?repositoryIRI ;
     rdfs:label ?label ;
     infai_v:tag ?tag ;
     infai_v:AKSW ?aksw ;
@@ -506,10 +519,13 @@ delete {
     dcterms:modified ?modified ;
     infai_v:documentationPage ?documentationPage ;
     .
+  ?repositoryIRI a rdfs:Resource ;
+	  foaf:page ?repositoryURL ;
+    .
 }
 WHERE {
   ?tool a rdfs:Resource ;
-  	infai_v:repository ?repositoryURL ;
+  	infai_v:repository ?repositoryIRI ;
     rdfs:label ?label ;
     infai_v:tag ?tag ;
     infai_v:AKSW ?aksw ;
@@ -520,13 +536,17 @@ WHERE {
     dcterms:created ?created ;
     dcterms:modified ?modified ;
     infai_v:documentationPage ?documentationPage ;
+    .
+  ?repositoryIRI a rdfs:Resource ;
+	  foaf:page ?repositoryURL ;
     .
   FILTER ( ?tool = <http://infai.org/data/semantictoolstack/resource1> )
 }
 */
 async function deleteTool(toolObject) {
-  const iri = projectObject.id;
+  const iri = toolObject.id;
   const tool = variable('tool')
+  const repositoryIRI = variable('repositoryIRI')
   const repositoryURL = variable('repositoryURL')
   const label = variable('label')
   const tag = variable('tag')
@@ -538,10 +558,9 @@ async function deleteTool(toolObject) {
   const created = variable('created')
   const modified = variable('modified')
   const documentationPage = variable('documentationPage')
-  // TODO: also delete repository
   var query =
     await DELETE`${tool} a ${rdfs.Resource} ;
-      ${infai_v.repository} ${repositoryURL} ;
+      ${infai_v.repository} ${repositoryIRI} ;
       ${rdfs.label} ${label} ;
       ${infai_v.tag} ${tag} ;
       ${infai_v.AKSW} ${aksw} ;
@@ -553,19 +572,25 @@ async function deleteTool(toolObject) {
       ${dcterms.modified} ${modified} ;
       ${infai_v.documentationPage} ${documentationPage} ;
       .
+      ${repositoryIRI} a ${rdfs.Resource} ;
+      ${foaf.page} ${repositoryURL} ;
+        .
     `
     .WHERE`${tool} a ${rdfs.Resource} ;
-        ${infai_v.repository} ${repositoryURL} ;
-        ${rdfs.label} ${label} ;
-        ${infai_v.tag} ${tag} ;
-        ${infai_v.AKSW} ${aksw} ;
-        ${infai_v.autoUpdate} ${autoUpdate} ;
-        ${infai_v.usedInProject} ${project} ;
-        ${rdfs.comment} ${comment} ;
-        ${foaf.logo} ${logo} ;
-        ${dcterms.created} ${created} ;
-        ${dcterms.modified} ${modified} ;
-        ${infai_v.documentationPage} ${documentationPage} ;
+      ${infai_v.repository} ${repositoryIRI} ;
+      ${rdfs.label} ${label} ;
+      ${infai_v.tag} ${tag} ;
+      ${infai_v.AKSW} ${aksw} ;
+      ${infai_v.autoUpdate} ${autoUpdate} ;
+      ${infai_v.usedInProject} ${project} ;
+      ${rdfs.comment} ${comment} ;
+      ${foaf.logo} ${logo} ;
+      ${dcterms.created} ${created} ;
+      ${dcterms.modified} ${modified} ;
+      ${infai_v.documentationPage} ${documentationPage} ;
+      .
+      ${repositoryIRI} a ${rdfs.Resource} ;
+        ${foaf.page} ${repositoryURL} ;
         .
       FILTER( ${tool} = <${iri}> )`
     .build();

@@ -24,7 +24,7 @@ export class Tool {
     return {
       "tool": this.id,
       "rdfs:label": this.label,
-      "infai_v:repository": this.repository.iri,
+      "infai_v:repository": this.repository.id,
       "infai_v:tag": "<"+this.tags.join(">, <")+">",
       "infai_v:AKSW": this.aksw,
       "infai_v:autoUpdate": this.autoUpdate,
@@ -41,7 +41,7 @@ export class Tool {
     const modifiedData = response.map(item => {
       return new Tool(
         item.label.value,
-        item.repositoryURL.value,
+        item.repositoryIRI.value,
         item.tags.value.split(", "),
         item.aksw.value === 'true',
         item.autoUpdate.value === 'true',
@@ -51,7 +51,8 @@ export class Tool {
         item.created.value,
         item.modified.value,
         item.documentationPage.value,
-        item.tool.value
+        item.tool.value,
+        item.repositoryURL.value,
       );
     }).sort((a, b) => a.label.localeCompare(b.label));
     return modifiedData;
