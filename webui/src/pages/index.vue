@@ -26,7 +26,7 @@
     <v-card-text>
       <v-window v-model="tab">
         <v-window-item value="#tools">
-          <Toollist />
+          <Toollist @update:hash="removeHash" />
         </v-window-item>
 
         <v-window-item value="#tags">

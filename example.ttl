@@ -9,8 +9,8 @@ infai_d:ressource1 a rdfs:Resource ;
 	infai_v:repository infai_d:repo1 ;
 	rdfs:label "RDF Processing Toolkit" ;
     infai_v:tag infai_d:label1, infai_d:label2 ;
-    infai_v:AKSW "true" ;
-    infai_v:autoUpdate "true" ;
+    infai_v:AKSW true ;
+    infai_v:autoUpdate true ;
     infai_v:usedInProject infai_d:STREAM, infai_d:Coypu, infai_d:KupferDigital ;
     rdfs:comment "Claus allmächtiges Tool" ;
     foaf:logo <https://avatars.githubusercontent.com/u/15215821?s=48&v=4> ;
@@ -18,7 +18,7 @@ infai_d:ressource1 a rdfs:Resource ;
     dcterms:modified "22-02-2024" ;
     infai_v:documentationPage <https://smartdataanalytics.github.io/RdfProcessingToolkit/> ;
     .
-	
+
 infai_d:repo1 a rdfs:Resource ;
 	foaf:page <https://github.com/SmartDataAnalytics/RdfProcessingToolkit> ;
     infai_v:lastCommit "2024-02-22" ;
