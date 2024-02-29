@@ -14,10 +14,21 @@
     <v-select
       v-model="formdata.tags"
       :items="tags"
-      chips
       label="Tags"
       multiple
-    ></v-select>
+      :return-object="true"
+      @change="updateChipColor"
+      :item-value="item => item"
+    >
+      <template #selection="{ item, index }">
+        <v-chip
+          :key="index"
+          :color="item.value.color"
+        >
+          {{ item.title }}
+        </v-chip>
+      </template>
+    </v-select>
 
     <v-checkbox
       v-model="formdata.aksw"
@@ -35,6 +46,8 @@
       chips
       label="Used in projects"
       multiple
+      :return-object="true"
+      :item-value="item => item"
     ></v-select>
 
     <v-textarea
@@ -59,9 +72,12 @@
 </template>
 
 <script>
-  import { useRouteDataStore } from '@/store/app'
+  import { useRouteDataStore, useSelectorStore } from '@/store/app'
   import { Tool } from '@/models/Tool'
-import { compileTemplate } from 'vue/compiler-sfc';
+  import { Tag } from '@/models/Tag'
+  import { Project } from '@/models/Project'
+  import { compileTemplate } from 'vue/compiler-sfc';
+  import { readResources } from '@/utils/helper';
 
   export default {
     props: {
@@ -109,32 +125,50 @@ import { compileTemplate } from 'vue/compiler-sfc';
     }),
     methods: {
       getTool() {
+        const store = useSelectorStore();
+        //prepare tags
+        var choosen = this.formdata.tags.map(item2 => {return item2.title});
+        var filtered = store.tags.filter(item => {return choosen.includes(item.label)}).map(item3 => item3.id);
+        console.log(this.formdata.tags, choosen, filtered)
+        //prepare projects
+        choosen = this.formdata.projects.map(item2 => {return item2.title});
+        var filtered2 = store.projects.filter(item => {return choosen.includes(item.label)}).map(item3 => item3.id);
+        console.log(this.formdata.projects, choosen, filtered2)
+
         return new Tool(
           this.formdata.label,
           this.formdata.repoURL,
-          this.formdata.tags.map(item => {return item.id}),
+          filtered,
           this.formdata.aksw,
           this.formdata.autoUpdate,
-          this.formdata.projects.map(item => {return item.id}),
+          filtered2,
           this.formdata.comment,
           this.formdata.logo,
           this.formdata.created,
-          this.formdata.modified,
+          (new Date()).toISOString().substring(0, 10),
           this.formdata.documentationPage,
           this.formdata.id,
           this.formdata.repoIRI,
         );
       },
       updateFormData(newData) {
+        const store = useSelectorStore();
         var temp = { ...newData };
-        if (typeof temp.tags == 'object' && temp.tags.length > 0 && typeof temp.tags[0] == 'string') {
-          temp.tags = temp.tags.map(item => {
-            return {id: item};
+        console.log(store, temp);
+
+        // handle tags, projects and repository
+        if (temp.tags.length > 0 && temp.tags[0].title == undefined) {
+          temp.tags = store.tags.filter(item => {
+            return temp.tags.includes(item.id)
+          }).map(item => {
+            return {title: item.label, color: item.color};
           });
         }
-        if (typeof temp.projects == 'object' && temp.projects.length > 0 && typeof temp.projects[0] == 'string') {
-          temp.projects = temp.projects.map(item => {
-            return {id: item};
+        if (temp.projects.length > 0 && temp.projects[0].title == undefined) {
+          temp.projects = store.projects.filter(item => {
+            return temp.projects.includes(item.id)
+          }).map(item => {
+            return {title: item.label};
           });
         }
         if (temp.repository && typeof temp.repository == 'object' && temp.repository.page) {
@@ -145,13 +179,34 @@ import { compileTemplate } from 'vue/compiler-sfc';
         this.formdata = temp;
         this.$emit('update:formdata', newData);
       },
+      updateChipColor(selectedItems) {
+        // This method is triggered when the selection changes.
+        // If you need to perform additional actions on color change, implement here.
+        console.log(selectedItems);
+      },
     },
-    mounted() {
+    async mounted() {
+      // read data for selectors
+      var data = await readResources("tags");
+      console.log("Data return: ", data, "type:", typeof data);
+      var localTags = Tag.transformFromSPARQL(data);
+      this.tags = localTags.map(item => {return {title: item.label, color: item.color}});
+      console.log("tags for selector: ", this.tags);
+      data = await readResources("projects");
+      console.log("Data return: ", data, "type:", typeof data);
+      var localProjects = Project.transformFromSPARQL(data);
+      this.projects = localProjects.map(item => {return {title: item.label}});;
+      // save them in store
+      const store2 = useSelectorStore();
+      store2.setTags(localTags);
+      store2.setProjects(localProjects);
+
+      // fill formdata from store or with inital values
       const store = useRouteDataStore();
       console.log(store.tool);
       if (store.tool.label && store.tool.label !== "") {
         this.updateFormData(store.tool);
-        store.clearTag();
+        store.clearTool();
       }
       else
         this.updateFormData(this.initialFormData); // Initialize formdata

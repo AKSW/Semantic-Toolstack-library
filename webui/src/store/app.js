@@ -34,3 +34,18 @@ export const useRouteDataStore = defineStore('routeData', {
     },
   }
 })
+
+export const useSelectorStore = defineStore('selectors', {
+  state: () => ({
+    tags: [],
+    projects: [],
+  }),
+  actions: {
+    setTags(tags) {
+      this.tags = tags
+    },
+    setProjects(projects) {
+      this.projects = projects
+    },
+  }
+})

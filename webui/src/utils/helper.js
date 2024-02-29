@@ -268,7 +268,7 @@ async function readTools() {
   const modified = variable('modified')
   const documentationPage = variable('documentationPage')
   var query =
-    await SELECT`${tool} ${repositoryURL} ${label} (GROUP_CONCAT(${tag}; SEPARATOR=", ") as ${tags}) ${aksw} ${autoUpdate} (GROUP_CONCAT(${project}; SEPARATOR=", ") as ${projects}) ${comment} ${logo} ${created} ${modified} ${documentationPage}`
+    await SELECT`${tool} ${repositoryURL} ${label} (GROUP_CONCAT(DISTINCT ${tag}; SEPARATOR=", ") as ${tags}) ${aksw} ${autoUpdate} (GROUP_CONCAT(DISTINCT ${project}; SEPARATOR=", ") as ${projects}) ${comment} ${logo} ${created} ${modified} ${documentationPage}`
       .WHERE`${tool} a ${rdfs.Resource} ;
         ${infai_v.repository} ${repositoryURL} ;
         ${rdfs.label} ${label} ;
