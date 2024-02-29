@@ -12,6 +12,7 @@ export const useRouteDataStore = defineStore('routeData', {
     tag: {},
     project: {},
     tool: {},
+    repository: {},
   }),
   actions: {
     setTag(tag) {
@@ -31,6 +32,12 @@ export const useRouteDataStore = defineStore('routeData', {
     },
     clearTool() {
       this.tool = {}
+    },
+    setRepository(repository) {
+      this.repository = repository
+    },
+    clearRepository() {
+      this.repository = {}
     },
   }
 })

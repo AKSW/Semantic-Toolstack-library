@@ -10,18 +10,39 @@ import { v4 as uuidv4 } from 'uuid';
 const infai_v = namespace('http://infai.org/vocabs/semantictoolstack/')
 const infai_d = namespace('http://infai.org/data/semantictoolstack/')
 const foaf = namespace(prefixes.foaf)
-const dc = namespace(prefixes.dc)
+const dc = namespace('http://purl.org/dc/elements/1.1/')
 const dcterms = namespace(prefixes.dcterms)
 const rdfs = namespace(prefixes.rdfs)
 
 // Constants
 const endpoint = "http://localhost:3030/resources/";
+const service = "http://127.0.0.1:8000"
 const delimiter = "xXXXx";
 export { delimiter };
 
 // Another helper function
 export function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+export async function triggerService(iri) {
+  const url = service+'/updateRepoData/?iri='+iri;
+
+  try {
+    const response = await fetch(url);
+
+    // Check if the request was successful
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (status: ${response.status})`);
+    }
+
+    const data = await response.json(); // Parse the JSON of the response
+    console.log(data); // Log the data
+    return data;
+  } catch (error) {
+    console.error('There was a problem with your fetch operation:', error);
+    return {};
+  }
 }
 
 // CREATE

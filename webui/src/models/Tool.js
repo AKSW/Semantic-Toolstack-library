@@ -93,23 +93,22 @@ export class Repository {
     };
   }
 
-  static transformFromSPARQL(response) {
-    const modifiedData = response.map(item => {
-      return new Repository(
-        item.page.value,
-        item.repository.value,
-        item.lastCommit.value,
-        item.modified.value,
-        item.description.value,
-        item.readme.value,
-        item.mainContributorName.value,
-        item.mainContributorIRI.value,
-        item.latestRelease.value,
-        item.language.value,
-        item.meta.value,
-        item.license.value,
-      );
-    }).sort((a, b) => a.modified.localeCompare(b.modified));
-    return modifiedData;
+  static transformFromSPARQL(item) {
+    if (!item)
+      return {};
+    return new Repository(
+      item.page.value,
+      item.repo.value,
+      item.lastCommit.value,
+      item.modified.value,
+      item.description.value,
+      item.readme.value,
+      item.mainContributor.value,
+      item.mainContributorIRI.value,
+      item.latestRelease.value,
+      item.language.value,
+      item.meta.value,
+      item.license.value,
+    );
   }
 }

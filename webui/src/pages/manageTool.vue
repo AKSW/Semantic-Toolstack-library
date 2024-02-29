@@ -14,6 +14,7 @@
       ref="childFormRef"
       @update:formdata="handleFormdataUpdate"
     ></tool-form>
+
     <v-btn
       block
       class="mt-2"
@@ -62,6 +63,7 @@
       alertTitle: "Tool was added",
       newTool: {},
       childFormData: {},
+      childFormData2: {},
     }),
     setup() {
       const router = useRouter();
@@ -74,9 +76,14 @@
     },
     methods: {
       handleFormdataUpdate(value) {
-        console.log("Update data from ToolForm in addTool with data:", value);
+        console.log("Update data from ToolForm in manageTool with data:", value);
         // Update the parent's data with the value from the child
         this.childFormData = value;
+      },
+      handleFormdataUpdate2(value) {
+        console.log("Update data from RepositoryForm in manageTool with data:", value);
+        // Update the parent's data with the value from the child
+        this.childFormData2 = value;
       },
       mydelete() {
         const tool = this.$refs.childFormRef.getTool();

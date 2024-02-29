@@ -69,6 +69,26 @@
       :rules="URLRule"
     ></v-text-field>
   </v-form>
+  <br>
+  <div v-show="showRepoDetails">
+    <h1>Details from Repository</h1>
+    <repository-form
+      ref="childFormRef"
+      :receivedValue="formdata.repoIRI"
+    ></repository-form>
+  </div>
+  <v-btn
+    block
+    class="mt-2"
+    prepend-icon="mdi-reload"
+    @click="loadRepositoryDetails">
+    <template v-slot:prepend>
+      <v-icon color="blue"></v-icon>
+    </template>
+    Reload details of repository
+  </v-btn>
+  <br>
+  <br>
 </template>
 
 <script>
@@ -77,7 +97,7 @@
   import { Tag } from '@/models/Tag'
   import { Project } from '@/models/Project'
   import { compileTemplate } from 'vue/compiler-sfc';
-  import { readResources } from '@/utils/helper';
+  import { readResources, triggerService } from '@/utils/helper';
 
   export default {
     props: {
@@ -123,6 +143,13 @@
       tags: [],
       projects: [],
     }),
+    computed: {
+      showRepoDetails() {
+        if (!this.formdata.repoURL || this.formdata.repoURL == "")
+          return false;
+        return true;
+      },
+    },
     methods: {
       getTool() {
         const store = useSelectorStore();
@@ -150,6 +177,10 @@
           this.formdata.id,
           this.formdata.repoIRI,
         );
+      },
+      async loadRepositoryDetails() {
+        await triggerService(this.formdata.repoIRI);
+        this.$refs.childFormRef.loadRepository();
       },
       updateFormData(newData) {
         const store = useSelectorStore();

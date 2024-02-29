@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from urllib.parse import unquote
 from repo import examine_url_and_fetch_info
 from SPARQLWrapper import SPARQLWrapper, POST, JSON
@@ -8,6 +9,15 @@ from datetime import datetime
 from urllib.parse import urlparse
 
 app = FastAPI()
+
+# Add CORSMiddleware to the application instance
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 # Specify the SPARQL endpoint URL
 sparql_endpoint = "http://localhost:3030/resources/"
