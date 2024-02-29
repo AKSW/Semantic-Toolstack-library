@@ -18,7 +18,7 @@ def get_github_repo_info(repo_name):
         latest_release_html_url = latest_release.html_url
     except:
         latest_release_tag = "No releases"
-        latest_release_html_url = None
+        latest_release_html_url = "http://example.org/special/undefined"
     
     latest_commit = repo.get_commits()[0]
     last_commit_author_url = latest_commit.author.html_url if latest_commit.author else ""
@@ -72,7 +72,7 @@ def get_gitlab_repo_info(repo_name):
     project = gl.projects.get(repo_name)
     releases = None
     latest_release_tag = "No releases"
-    latest_release_html_url = ""
+    latest_release_html_url = "http://example.org/special/undefined"
     try:
         releases = project.releases.list()
         if releases:

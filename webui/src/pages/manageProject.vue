@@ -97,6 +97,11 @@
 
         // Show the alert
         this.showAlert = true;
+        window.scrollTo({
+          top: 0,
+          left: 0,
+          behavior: 'smooth'
+        });
 
         // Set a timer to hide the alert after 5 seconds
         setTimeout(() => {
@@ -128,6 +133,11 @@
 
         // Show the alert
         this.showAlert = true;
+        window.scrollTo({
+          top: 0,
+          left: 0,
+          behavior: 'smooth'
+        });
 
         // Set a timer to hide the alert after 5 seconds
         setTimeout(() => {

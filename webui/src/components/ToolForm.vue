@@ -76,17 +76,17 @@
       ref="childFormRef"
       :receivedValue="formdata.repoIRI"
     ></repository-form>
+    <v-btn
+      block
+      class="mt-2"
+      prepend-icon="mdi-reload"
+      @click="loadRepositoryDetails">
+      <template v-slot:prepend>
+        <v-icon color="blue"></v-icon>
+      </template>
+      Reload details of repository
+    </v-btn>
   </div>
-  <v-btn
-    block
-    class="mt-2"
-    prepend-icon="mdi-reload"
-    @click="loadRepositoryDetails">
-    <template v-slot:prepend>
-      <v-icon color="blue"></v-icon>
-    </template>
-    Reload details of repository
-  </v-btn>
   <br>
   <br>
 </template>
@@ -145,7 +145,7 @@
     }),
     computed: {
       showRepoDetails() {
-        if (!this.formdata.repoURL || this.formdata.repoURL == "")
+        if (this.formdata.repoURL == "" || this.formdata.repoIRI == "")
           return false;
         return true;
       },
