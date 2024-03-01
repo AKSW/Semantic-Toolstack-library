@@ -86,15 +86,20 @@ def get_gitlab_repo_info(repo_name):
     escapedUserName = quote(latest_commit.author_name)
     open_merge_requests_count = project.mergerequests.list(state='opened').__len__()
     try:
-        readme_content = project.files.get(file_path='README.md', ref=project.default_branch).decode()
+        readme_content_bytes = project.files.get(file_path='README.md', ref=project.default_branch).decode()
+        readme_content = readme_content_bytes.decode('utf-8')
     except:
         readme_content = "No README.md found"
+    try:
+        number_of_issues = project.open_issues_count
+    except:
+        number_of_issues = 0
     
     return {
         'description': project.description,
         'language': "N/A",
         'forks_count': project.forks_count,
-        'license_url': project.license_url if hasattr(project, 'license_url') else "No license URL",
+        'license': project.license_url if hasattr(project, 'license_url') else "No license URL",
         'latest_release_tag': latest_release_tag,
         'latest_release_html_url': latest_release_html_url,
         'last_commit_author': latest_commit.author_name,
@@ -103,7 +108,7 @@ def get_gitlab_repo_info(repo_name):
         'last_commit_date': latest_commit.committed_date,
         'open_pull_requests_count': open_merge_requests_count,
         'owner': "", #project.owner['username'] if project.owner else "No owner information", # owner attribut not existing
-        'number_of_issues': project.open_issues_count,
+        'number_of_issues': number_of_issues,
         'readme_content': readme_content,
     }
 
