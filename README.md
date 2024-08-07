@@ -14,17 +14,6 @@ Under folder webui.
 
 Based on VueJS 3.
 
-### Todo
-
-* Transform sparql building into models
-* Add more optic feedback
-* Enhance usability
-* Add more information to the models/RDF
-* Add filter to the lists
-* Add credentials to SPARQL endpoint
-* Use logging library
-* Use env to set constants
-
 ## Middleware
 
 Under folder service.

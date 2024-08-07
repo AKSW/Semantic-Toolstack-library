@@ -2,3 +2,5 @@ PyGithub
 python-gitlab
 rdflib
 SPARQLWrapper
+fastapi
+uvicorn

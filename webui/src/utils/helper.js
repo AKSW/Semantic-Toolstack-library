@@ -15,7 +15,7 @@ const dcterms = namespace(prefixes.dcterms)
 const rdfs = namespace(prefixes.rdfs)
 
 // Constants
-const endpoint = "http://localhost:3030/resources/";
+const endpoint = "http://localhost:3030/1/";
 const service = "http://127.0.0.1:8000"
 const delimiter = "xXXXx";
 export { delimiter };
@@ -160,13 +160,17 @@ async function createTool(tool) {
 }
 
 async function executeSparqlUpdate(query) {
+  const username = 'admin';
+  const password = 'passwd';
+  const authHeader = 'Basic ' + btoa(username + ':' + password);
   const headers = {
       "Content-Type": "application/sparql-update",
-      "Accept": "application/sparql-results+json"
+      "Accept": "application/sparql-results+json",
+      'Authorization': authHeader
   };
 
   try {
-      const response = await fetch(endpoint, {
+      const response = await fetch(endpoint+"update", {
           method: "POST",
           headers: headers,
           body: query
@@ -401,7 +405,7 @@ async function executeSparqlQuery(query) {
   };
 
   try {
-      const response = await fetch(endpoint, {
+      const response = await fetch(endpoint+"query", {
           method: "POST",
           headers: headers,
           body: query

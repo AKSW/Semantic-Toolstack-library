@@ -1,2 +1,4 @@
 ./run/**
 run
+./db_storage/*
+./db_storage/**

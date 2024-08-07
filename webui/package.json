@@ -2,7 +2,7 @@
   "name": "vuetify-project",
   "version": "0.0.0",
   "scripts": {
-    "dev": "cross-env NODE_OPTIONS='--no-warnings' vite",
+    "dev": "cross-env NODE_OPTIONS='--no-warnings' vite --host",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --fix --ignore-path .gitignore"

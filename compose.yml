@@ -1,0 +1,24 @@
+services:
+  service:
+    build: ./service/
+    ports:
+      - 8000:8000
+    volumes:
+      - ./service/:/srv/
+    
+  app:
+    build: ./webui/
+    ports:
+      - 8001:3000
+    volumes:
+      - ./webui/:/srv/
+    
+  db:
+    image: stain/jena-fuseki
+    ports:
+      - 3030:3030
+    volumes:
+      - ./db_storage:/fuseki
+    environment:
+      - ADMIN_PASSWORD=passwd
+      - TDB=2
