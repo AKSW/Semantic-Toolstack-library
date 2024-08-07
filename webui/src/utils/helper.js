@@ -127,6 +127,7 @@ Insert data {
     dcterms:created "22-02-2024" ;
     dcterms:modified "22-02-2024" ;
     infai_v:documentationPage <https://smartdataanalytics.github.io/RdfProcessingToolkit/> ;
+    infai_v:status "interesting" ;
     .
   infai_d:repo1 a rdfs:Resource ;
 	  foaf:page <https://github.com/SmartDataAnalytics/RdfProcessingToolkit> ;
@@ -148,6 +149,7 @@ async function createTool(tool) {
       ${dcterms.created} "${tool.created}" ;
       ${dcterms.modified} "${tool.modified}" ;
       ${infai_v.documentationPage} <${tool.documentationPage}> ;
+      ${infai_v.status} "${tool.status}" ;
       .
       <${tool.repository.id}> a ${rdfs.Resource} ;
         ${foaf.page} <${tool.repository.page}> ;
@@ -278,6 +280,7 @@ WHERE {
     dcterms:created ?created ;
     dcterms:modified ?modified ;
     infai_v:documentationPage ?documentationPage ;
+    infai_v:status ?status ;
     .
   	FILTER ( ?label != "" )
     ?repositoryIRI a rdfs:Resource ;
@@ -302,8 +305,9 @@ async function readTools() {
   const created = variable('created')
   const modified = variable('modified')
   const documentationPage = variable('documentationPage')
+  const status = variable('status')
   var query =
-    await SELECT`${tool} ${repositoryIRI} ${repositoryURL} ${label} (GROUP_CONCAT(DISTINCT ${tag}; SEPARATOR=", ") as ${tags}) ${aksw} ${autoUpdate} (GROUP_CONCAT(DISTINCT ${project}; SEPARATOR=", ") as ${projects}) ${comment} ${logo} ${created} ${modified} ${documentationPage}`
+    await SELECT`${tool} ${repositoryIRI} ${repositoryURL} ${label} (GROUP_CONCAT(DISTINCT ${tag}; SEPARATOR=", ") as ${tags}) ${aksw} ${autoUpdate} (GROUP_CONCAT(DISTINCT ${project}; SEPARATOR=", ") as ${projects}) ${comment} ${logo} ${created} ${modified} ${documentationPage} ${status}`
       .WHERE`${tool} a ${rdfs.Resource} ;
         ${infai_v.repository} ${repositoryIRI} ;
         ${rdfs.label} ${label} ;
@@ -320,8 +324,9 @@ async function readTools() {
         ${repositoryIRI} a ${rdfs.Resource} ;
           ${foaf.page} ${repositoryURL} ;
           .
-        FILTER ( ${label} != "" )`
-      .GROUP().BY`${tool}) (${repositoryIRI}) (${repositoryURL}) (${label}) (${aksw}) (${autoUpdate}) (${comment}) (${logo}) (${created}) (${modified}) (${documentationPage}`
+        FILTER ( ${label} != "" )
+        OPTIONAL { ${tool} ${infai_v.status} ${status} ; }`
+      .GROUP().BY`${tool}) (${repositoryIRI}) (${repositoryURL}) (${label}) (${aksw}) (${autoUpdate}) (${comment}) (${logo}) (${created}) (${modified}) (${documentationPage}) (${status}`
       .build();
   console.log("query: ", query)
   var response = await executeSparqlQuery(query)

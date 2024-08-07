@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 export class Tool {
-  constructor(label, repositoryURL, tags, aksw, autoUpdate, projects, comment, logo, created, modified, documentationPage, id = "", repositoryIRI = "") {
+  constructor(label, repositoryURL, tags, aksw, autoUpdate, projects, comment, logo, created, modified, documentationPage, id = "", repositoryIRI = "", status = "interesting") {
     this.id = id;
     this.label = label;
     var iri = repositoryIRI;
@@ -18,6 +18,7 @@ export class Tool {
     this.created = created || now;
     this.modified = modified || now;
     this.documentationPage = documentationPage;
+    this.status = status;
   }
 
   transformForSPARQL() {
@@ -34,6 +35,7 @@ export class Tool {
       "dcterms:created": this.creted,
       "dcterms:modified": this.modified,
       "infai_v:documentationPage": this.documentationPage,
+      "infai_v:status": this.status || "interesting",
     };
   }
 
@@ -53,6 +55,7 @@ export class Tool {
         item.documentationPage.value,
         item.tool.value,
         item.repositoryIRI.value,
+        ((item.status != undefined) ? item.status.value : "interesting"),
       );
     }).sort((a, b) => a.label.localeCompare(b.label));
     return modifiedData;

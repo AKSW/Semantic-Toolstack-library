@@ -17,6 +17,7 @@ infai_d:ressource1 a rdfs:Resource ;
     dcterms:created "22-02-2024" ;
     dcterms:modified "22-02-2024" ;
     infai_v:documentationPage <https://smartdataanalytics.github.io/RdfProcessingToolkit/> ;
+    infai_v:status "interesting" ;
     .
 
 infai_d:repo1 a rdfs:Resource ;

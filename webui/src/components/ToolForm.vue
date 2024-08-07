@@ -12,6 +12,23 @@
     ></v-text-field>
 
     <v-select
+      v-model="formdata.status"
+      :items="statuses"
+      label="Status"
+      :return-object="true"
+      @change="updateChipColor"
+      :item-value="item => item"
+    >
+      <template #selection="{ item, index }">
+        <v-chip
+          :key="index"
+        >
+          {{ item.title }}
+        </v-chip>
+      </template>
+    </v-select>
+
+    <v-select
       v-model="formdata.tags"
       :items="tags"
       label="Tags"
@@ -99,6 +116,8 @@
   import { compileTemplate } from 'vue/compiler-sfc';
   import { readResources, triggerService } from '@/utils/helper';
 
+  const statuses = ["irrelevant", "interesting", "planned to be used", "in use"];
+
   export default {
     props: {
       initialFormData: {
@@ -117,6 +136,7 @@
           created: "",
           modified: "",
           documentationPage: "",
+          status: "interesting"
         }),
       },
     },
@@ -135,6 +155,7 @@
         created: "",
         modified: "",
         documentationPage: "",
+        status: "interesting"
       },
       URLRule: [
         v => !!v || 'URL is required', // Checks if the value is not empty
@@ -142,6 +163,7 @@
       ],
       tags: [],
       projects: [],
+      statuses: statuses
     }),
     computed: {
       showRepoDetails() {
@@ -153,11 +175,11 @@
     methods: {
       getTool() {
         const store = useSelectorStore();
-        //prepare tags
+        // prepare tags
         var choosen = this.formdata.tags.map(item2 => {return item2.title});
         var filtered = store.tags.filter(item => {return choosen.includes(item.label)}).map(item3 => item3.id);
         console.log(this.formdata.tags, choosen, filtered)
-        //prepare projects
+        // prepare projects
         choosen = this.formdata.projects.map(item2 => {return item2.title});
         var filtered2 = store.projects.filter(item => {return choosen.includes(item.label)}).map(item3 => item3.id);
         console.log(this.formdata.projects, choosen, filtered2)
@@ -176,6 +198,7 @@
           this.formdata.documentationPage,
           this.formdata.id,
           this.formdata.repoIRI,
+          this.formdata.status,
         );
       },
       async loadRepositoryDetails() {
