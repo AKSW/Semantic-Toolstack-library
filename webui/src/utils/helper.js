@@ -15,8 +15,8 @@ const dcterms = namespace(prefixes.dcterms)
 const rdfs = namespace(prefixes.rdfs)
 
 // Constants
-const endpoint = "http://localhost:3030/1/";
-const service = "http://127.0.0.1:8000"
+const endpoint = `${import.meta.env.VITE_DB_URL}/${import.meta.env.VITE_DB_DATASET}/`;
+const service = import.meta.env.VITE_SERVICE_URL;
 const delimiter = "xXXXx";
 export { delimiter };
 
@@ -160,8 +160,8 @@ async function createTool(tool) {
 }
 
 async function executeSparqlUpdate(query) {
-  const username = 'admin';
-  const password = 'passwd';
+  const username = import.meta.env.VITE_DB_USER;
+  const password = import.meta.env.VITE_DB_PASSWORD;
   const authHeader = 'Basic ' + btoa(username + ':' + password);
   const headers = {
       "Content-Type": "application/sparql-update",

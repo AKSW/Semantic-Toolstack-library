@@ -6,4 +6,4 @@ RUN cd /srv && pip install -r requirements.txt
 
 WORKDIR /srv
 
-ENTRYPOINT python3 app.py
+ENTRYPOINT ./source.sh && python3 app.py

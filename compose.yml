@@ -5,6 +5,11 @@ services:
       - 8000:8000
     volumes:
       - ./service/:/srv/
+    environment:
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_USER=admin
+      - DB_URL=http://db:3030
+      - DB_DATASET=${DB_DATASET}
     
   app:
     build: ./webui/
@@ -12,6 +17,12 @@ services:
       - 8001:3000
     volumes:
       - ./webui/:/srv/
+    environment:
+      - VITE_DB_PASSWORD=${DB_PASSWORD}
+      - VITE_DB_USER=admin
+      - VITE_DB_URL=${DB_URL}
+      - VITE_DB_DATASET=${DB_DATASET}
+      - VITE_SERVICE_URL=${SERVICE_URL}
     
   db:
     image: stain/jena-fuseki
@@ -20,5 +31,5 @@ services:
     volumes:
       - ./db_storage:/fuseki
     environment:
-      - ADMIN_PASSWORD=passwd
+      - ADMIN_PASSWORD=${DB_PASSWORD}
       - TDB=2

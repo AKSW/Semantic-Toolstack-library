@@ -7,6 +7,7 @@ from rdflib import Graph, URIRef, Literal, Namespace
 from rdflib.namespace import RDF, FOAF, RDFS, DC, DCTERMS
 from datetime import datetime
 from urllib.parse import urlparse
+import os
 
 app = FastAPI()
 
@@ -20,10 +21,13 @@ app.add_middleware(
 )
 
 # Specify the SPARQL endpoint URL
-sparql_endpoint = "http://localhost:3030/resources/"
+sparql_endpoint = os.getenv('DB_URL')+"/"+os.getenv('DB_DATASET')+"/"
 
 # Initialize SPARQLWrapper with the endpoint URL
-sparql = SPARQLWrapper(sparql_endpoint)
+sparql_query = SPARQLWrapper(sparql_endpoint + "query")
+sparql_query.setCredentials(os.getenv('DB_USER'), os.getenv('DB_PASSWORD'))
+sparql_update = SPARQLWrapper(sparql_endpoint + "update")
+sparql_update.setCredentials(os.getenv('DB_USER'), os.getenv('DB_PASSWORD'))
 
 # Namespaces (add more as needed)
 ns = {
@@ -43,6 +47,7 @@ async def updateRepoData(iri: str):
     Example usage: /updateRepoData/?iri=http%3A%2F%2Fexample.com%2F%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82
     """
     print(iri)
+    print("SPARQL endpoint: "+sparql_endpoint)
     try:
         # Decode the IRI
         decoded_iri = unquote(iri)
@@ -97,11 +102,11 @@ async def updateRepoData(iri: str):
     print(query)
 
     # Initialize SPARQLWrapper
-    sparql.setQuery(query)
-    sparql.setMethod(POST)
+    sparql_update.setQuery(query)
+    sparql_update.setMethod(POST)
     # Execute the query
     try:
-        sparql.query()
+        sparql_update.query()
         return {"message": "Data updated successfully into RDF store."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -111,7 +116,7 @@ def getRepoURLFromRepoResource(resource: str):
     repo_page = ""
 
     # Define the SPARQL query
-    sparql_query = """
+    query = """
         PREFIX : <http://example.com/>
         PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 
@@ -120,15 +125,15 @@ def getRepoURLFromRepoResource(resource: str):
         <{resource_iri}> foaf:page ?repoPage .
         }}
     """.format(resource_iri=resource)
-    print(sparql_query)
+    print(query)
 
     # Set the query and return format
-    sparql.setQuery(sparql_query)
-    sparql.setReturnFormat(JSON)
+    sparql_query.setQuery(query)
+    sparql_query.setReturnFormat(JSON)
 
     # Execute the query and process the results
     try:
-        results = sparql.query().convert()
+        results = sparql_query.query().convert()
         # Extract the IRI from the results
         for result in results["results"]["bindings"]:
             repo_page = result["repoPage"]["value"]
@@ -141,4 +146,4 @@ def getRepoURLFromRepoResource(resource: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

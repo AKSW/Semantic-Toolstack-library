@@ -6,4 +6,4 @@ RUN cd /srv && npm install
 
 WORKDIR /srv
 
-ENTRYPOINT npm run dev
+ENTRYPOINT printenv | grep '^VITE_' > .env && npm run dev
