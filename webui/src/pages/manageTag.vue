@@ -103,12 +103,12 @@
           behavior: 'smooth'
         });
 
-        // Set a timer to hide the alert after 5 seconds
+        // Set a timer to hide the alert after 1 seconds
         setTimeout(() => {
           this.showAlert = false;
           this.newTag = {};
           this.goBack();
-        }, 5000);
+        }, 1000);
       },
       save() {
         const tag = this.$refs.childFormRef.getTag();
@@ -139,12 +139,12 @@
           behavior: 'smooth'
         });
 
-        // Set a timer to hide the alert after 5 seconds
+        // Set a timer to hide the alert after 1 seconds
         setTimeout(() => {
           this.showAlert = false;
           this.newTag = {};
           this.goBack();
-        }, 5000);
+        }, 1000);
       },
     },
   }

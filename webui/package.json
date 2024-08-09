@@ -1,6 +1,6 @@
 {
-  "name": "vuetify-project",
-  "version": "0.0.0",
+  "name": "semantic-toolstack-library",
+  "version": "0.2",
   "scripts": {
     "dev": "cross-env NODE_OPTIONS='--no-warnings' vite --host",
     "build": "vite build",

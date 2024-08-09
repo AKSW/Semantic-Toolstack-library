@@ -50,4 +50,14 @@ infai_d:STREAM a rdfs:Resource ;
     rdfs:label "STREAM" ;
     foaf:page <https://stream-projekt.net> ;
     infai_v:startDate "01-08-2019" ;
+    dc:description "Material data digitalization" ;
+    infai_v:duration 36 ;
+    infai_v:client "" ;
+    infai_v:minstry "BMBF" ;
+    infai_v:id "16QK11" ;
+    infai_v:leadingPerson <http://aksw.org/KurtJunghanns> ;
+    infai_v:consortiumLead false ;
+    infai_v:filesLocation <https://drive.google.com/drive/folders/1YmOmDc0NMd3JDTDOjMyWjErCaR5d4sTd> ;
+    foaf:logo <https://stream-project.github.io/website/assets/images/logo.jpg> ;
+    infai_v:repositoryBasis <https://github.com/stream-project> ;
     .

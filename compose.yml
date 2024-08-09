@@ -16,7 +16,7 @@ services:
     ports:
       - 8001:3000
     volumes:
-      - ./webui/:/srv/
+      - ./webui/src/:/srv/src/
     environment:
       - VITE_DB_PASSWORD=${DB_PASSWORD}
       - VITE_DB_USER=admin

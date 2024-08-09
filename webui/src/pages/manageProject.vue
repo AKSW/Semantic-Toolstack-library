@@ -103,12 +103,12 @@
           behavior: 'smooth'
         });
 
-        // Set a timer to hide the alert after 5 seconds
+        // Set a timer to hide the alert after 2 seconds
         setTimeout(() => {
           this.showAlert = false;
           this.newProject = {};
           this.goBack();
-        }, 5000);
+        }, 2000);
       },
       save() {
         const project = this.$refs.childFormRef.getProject();
@@ -139,12 +139,12 @@
           behavior: 'smooth'
         });
 
-        // Set a timer to hide the alert after 5 seconds
+        // Set a timer to hide the alert after 2 seconds
         setTimeout(() => {
           this.showAlert = false;
           this.newProject = {};
           this.goBack();
-        }, 5000);
+        }, 2000);
       },
     },
   }

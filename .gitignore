@@ -3,3 +3,4 @@ run
 ./db_storage/*
 ./db_storage/**
 .env
+data.ntrig

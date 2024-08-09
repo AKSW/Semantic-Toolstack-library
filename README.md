@@ -6,8 +6,6 @@ The idea is that tools are added via the webapp and its metadata from its reposi
 
 This is a prototype.
 
-Plan: docker based.
-
 ## Web GUI
 
 Under folder webui.
@@ -27,8 +25,4 @@ Started with `jena/apache-jena-fuseki-4.10.0/fuseki-server`
 
 ### Todo
 
-* Add credentials
-
-## Docker
-
-TODO
+* Add more security
