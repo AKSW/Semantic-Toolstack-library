@@ -6,6 +6,7 @@ GRAPH_FILE_URL="https://raw.githubusercontent.com/AKSW/aksw.org-model/main/aksw.
 NT_FILE="aksw.nt"
 GRAPH_FILE="aksw.graph"
 TDB_DIRECTORY="./db_storage/databases/1/"
+TEMP_SPARQL_FILE="drop_graph.sparql"
 
 docker stop semantic-toolstack-library-db-1
 sleep 1s
@@ -27,6 +28,15 @@ if [ -z "$NAMED_GRAPH_URI" ]; then
 fi
 
 echo "Named Graph URI found: $NAMED_GRAPH_URI"
+
+# Create a temporary SPARQL file to drop the existing named graph
+echo "Creating SPARQL file to drop the existing named graph..."
+echo "DROP GRAPH <$NAMED_GRAPH_URI>;" > $TEMP_SPARQL_FILE
+
+# Drop the existing named graph (if it exists)
+echo "Dropping the existing named graph..."
+sudo ~/Documents/apache-jena-5.1.0/bin/tdb2.tdbupdate --loc=$TDB_DIRECTORY --update=$TEMP_SPARQL_FILE
+
 # Import the converted .nt file into TDB with the specified named graph
 echo "Importing the converted .nt file into TDB..."
 sudo ~/Documents/apache-jena-5.1.0/bin/tdb2.tdbloader --graph=$NAMED_GRAPH_URI --loc=$TDB_DIRECTORY $NT_FILE
@@ -34,6 +44,6 @@ sudo ~/Documents/apache-jena-5.1.0/bin/tdb2.tdbloader --graph=$NAMED_GRAPH_URI -
 echo "Import completed."
 
 # Clean up temporary files
-rm $NT_FILE $GRAPH_FILE
+rm $NT_FILE $GRAPH_FILE $TEMP_SPARQL_FILE
 
 docker start semantic-toolstack-library-db-1
