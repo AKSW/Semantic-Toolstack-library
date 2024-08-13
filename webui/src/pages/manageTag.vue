@@ -117,7 +117,7 @@
         var response = "";
         if (tag.id !== '')
           response = deleteResource("tag", tag);
-        response = createResource("tag", tag);
+        response = createResource(tag);
 
         // handle
         if (typeof response !== typeof "string") {//should be the other way around but does not work

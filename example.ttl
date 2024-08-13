@@ -1,11 +1,14 @@
 @prefix infai_v: <http://infai.org/vocabs/semantictoolstack/> .
-@prefix infai_d: <http://infai.org/data/semantictoolstack/> .
+@prefix infai_tags: <http://infai.org/data/semantictoolstack/tags/> .
+@prefix infai_projects: <http://infai.org/data/semantictoolstack/projects/> .
+@prefix infai_tools: <http://infai.org/data/semantictoolstack/tools/> .
+@prefix infai_repositories: <http://infai.org/data/semantictoolstack/repositories/> .
 @prefix dc: <http://purl.org/dc/elements/1.1/> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-infai_d:ressource1 a rdfs:Resource ;
+infai_tools:ressource1 a rdfs:Resource ;
 	infai_v:repository infai_d:repo1 ;
 	rdfs:label "RDF Processing Toolkit" ;
     infai_v:tag infai_d:label1, infai_d:label2 ;
@@ -20,7 +23,7 @@ infai_d:ressource1 a rdfs:Resource ;
     infai_v:status "interesting" ;
     .
 
-infai_d:repo1 a rdfs:Resource ;
+infai_repositories:repo1 a rdfs:Resource ;
 	foaf:page <https://github.com/SmartDataAnalytics/RdfProcessingToolkit> ;
     infai_v:lastCommit "2024-02-22" ;
     dcterms:modified "22-02-2024" ;
@@ -34,19 +37,19 @@ infai_d:repo1 a rdfs:Resource ;
     dcterms:license "Apache License Version 2.0" ;
     .
 
-infai_d:label1 a rdfs:Resource ;
+infai_tags:label1 a rdfs:Resource ;
     rdfs:label "Up-to-date" ;
     infai_v:color "white" ;
     infai_v:group "meta" ;
     .
 
-infai_d:label2 a rdfs:Resource ;
+infai_tags:label2 a rdfs:Resource ;
     rdfs:label "CLI" ;
     infai_v:color "black" ;
     infai_v:group "meta" ;
     .
 
-infai_d:STREAM a rdfs:Resource ;
+infai_projects:STREAM a rdfs:Resource ;
     rdfs:label "STREAM" ;
     foaf:page <https://stream-projekt.net> ;
     infai_v:startDate "01-08-2019" ;

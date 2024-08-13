@@ -5,6 +5,9 @@ import namespace from '@rdfjs/namespace'
 import prefixes from '@zazuko/prefixes/prefixes'
 import { INSERT, SELECT, DELETE } from '@tpluscode/sparql-builder'
 import { v4 as uuidv4 } from 'uuid';
+import { Tag } from '@/models/Tag'
+import { Project } from '@/models/Project'
+import { Tool, Repository } from '@/models/Tool'
 
 // Namespaces
 const infai_v = namespace('http://infai.org/vocabs/semantictoolstack/')
@@ -47,118 +50,28 @@ export async function triggerService(iri) {
 
 // CREATE
 // create resource
-export function createResource(type, data) {
-  switch (type) {
-    case 'tag':
-      return createTag(data)
-      break;
-    case 'project':
-      return createProject(data)
-      break;
-    case 'tool':
-      return createTool(data)
-      break;
+export async function createResource(data) {
+  var query =
+    await INSERT.DATA`${insertBuilder(data)}
+      .
+    `
+      .build();
+  console.log("query: ", query)
+  var response = await executeSparqlUpdate(query)
+  return response;
+}
 
-    default:
-      return null;
-      break;
+function insertBuilder(obj) {
+  console.log(obj)
+  const resource = obj.constructor.__namespace+uuidv4();
+
+  var ret = `<${resource}> a <${obj.constructor.__type.value}> ;\n`;
+  for (var key of Object.keys(obj)) {
+    if (key !== "id") {
+      ret += `<${obj.constructor.__predicateMap[key].value}> ${obj.sparqlSnippet(key)} ;\n`
+    }
   }
-}
-
-/*
-Insert data {
-  infai_d:label2 a rdfs:Resource ;
-    rdfs:label "CLI" ;
-    infai_v:color "black" ;
-    infai_v:group "meta" ;
-    .
-}
-*/
-async function createTag(tag) {
-  const resource = "http://infai.org/data/semantictoolstack/"+uuidv4();
-  var query =
-    await INSERT.DATA`<${resource}> a ${rdfs.Resource} ;
-      ${rdfs.label} "${tag.label}" ;
-      ${infai_v.color} "${tag.color}" ;
-      ${infai_v.group} "${tag.group}"
-      .
-    `
-      .build();
-  console.log("query: ", query)
-  var response = await executeSparqlUpdate(query)
-  return response;
-}
-
-/*
-Insert data {
-  infai_d:STREAM a rdfs:Resource ;
-    rdfs:label "STREAM" ;
-    foaf:page <http...> ;
-    infai_v:startDate "2024" ;
-    .
-}
-*/
-async function createProject(project) {
-  const resource = "http://infai.org/data/semantictoolstack/"+uuidv4();
-  var query =
-    await INSERT.DATA`<${resource}> a ${rdfs.Resource} ;
-      ${rdfs.label} "${project.label}" ;
-      ${foaf.page} <${project.page}> ;
-      ${infai_v.startDate} "${project.startDate}"
-      .
-    `
-      .build();
-  console.log("query: ", query)
-  var response = await executeSparqlUpdate(query)
-  return response;
-}
-
-/*
-Insert data {
-  infai_d:resource1 a rdfs:Resource ;
-    infai_v:repository infai_d:repo1 ;
-	  rdfs:label "RDF Processing Toolkit" ;
-    infai_v:tag infai_d:label1, infai_d:label2 ;
-    infai_v:AKSW "true" ;
-    infai_v:autoUpdate "true" ;
-    infai_v:usedInProject infai_d:STREAM, infai_d:Coypu, infai_d:KupferDigital ;
-    rdfs:comment "Claus allmächtiges Tool" ;
-    foaf:logo <https://avatars.githubusercontent.com/u/15215821?s=48&v=4> ;
-    dcterms:created "22-02-2024" ;
-    dcterms:modified "22-02-2024" ;
-    infai_v:documentationPage <https://smartdataanalytics.github.io/RdfProcessingToolkit/> ;
-    infai_v:status "interesting" ;
-    .
-  infai_d:repo1 a rdfs:Resource ;
-	  foaf:page <https://github.com/SmartDataAnalytics/RdfProcessingToolkit> ;
-    .
-}
-*/
-async function createTool(tool) {
-  const resource = "http://infai.org/data/semantictoolstack/"+uuidv4();
-  var query =
-    await INSERT.DATA`<${resource}> a ${rdfs.Resource} ;
-      ${infai_v.repository} <${tool.repository.id}> ;
-      ${rdfs.label} "${tool.label}" ;
-      ${infai_v.tag} ${"<"+tool.tags.join(">, <")+">"} ;
-      ${infai_v.AKSW} ${tool.aksw} ;
-      ${infai_v.autoUpdate} ${tool.autoUpdate} ;
-      ${infai_v.usedInProject} ${"<"+tool.projects.join(">, <")+">"} ;
-      ${rdfs.comment} """${tool.comment}""" ;
-      ${foaf.logo} <${tool.logo}> ;
-      ${dcterms.created} "${tool.created}" ;
-      ${dcterms.modified} "${tool.modified}" ;
-      ${infai_v.documentationPage} <${tool.documentationPage}> ;
-      ${infai_v.status} "${tool.status}" ;
-      .
-      <${tool.repository.id}> a ${rdfs.Resource} ;
-        ${foaf.page} <${tool.repository.page}> ;
-        .
-    `
-      .build();
-  console.log("query: ", query)
-  var response = await executeSparqlUpdate(query)
-  return response;
+  return ret;
 }
 
 async function executeSparqlUpdate(query) {
@@ -187,150 +100,63 @@ async function executeSparqlUpdate(query) {
 }
 
 // READ
-export function readResources(type) {
+export async function readResources(type) {
+  var obj;
   switch (type) {
     case 'tags':
-      return readTags()
+      obj = new Tag();
       break;
     case 'projects':
-      return readProjects()
+      obj = new Project();
       break;
-    case 'tools':
-      return readTools()
+    case 'tools': // TODO: read Repository afterwards
+      obj = new Tool();
+      break;
+    case 'repositories':
+      obj = new Repository();
       break;
 
     default:
-      return null;
       break;
   }
-}
 
-/*
-SELECT *
-WHERE {
-  ?tag a rdfs:Resource ;
-  	rdfs:label ?label ;
-    infai_v:color ?color ;
-    infai_v:group ?group ;
+  var myselect = obj.constructor.__select;
+  if (myselect === undefined || myselect === "")
+    myselect = selectBuilder(obj);
+  var mywhere = selectWhereBuilder(obj);
+  var promise = SELECT`${myselect}`
+  .WHERE`${mywhere}
     .
-  	FILTER ( ?label != "" )
-}
-*/
-async function readTags() {
-  const tag = variable('tag')
-  const label = variable('label')
-  const color = variable('color')
-  const group = variable('group')
-  var query =
-    await SELECT`${tag} ${label} ${color} ${group}`
-      .WHERE`${tag} a ${rdfs.Resource} ;
-        ${rdfs.label} ${label} ;
-        ${infai_v.color} ${color} ;
-        ${infai_v.group} ${group} ;
-        .
-        FILTER ( ${label} != "" )`
-      .build();
+    FILTER ( ?label != "" )`;
+  var grouping = obj.constructor.__group;
+  if (grouping !== undefined || grouping === "") {
+    promise = promise.GROUP().BY`${grouping}`
+  }
+  var query = await promise.build();
   console.log("query: ", query)
   var response = await executeSparqlQuery(query)
   return response.results.bindings;
 }
 
-/*
-SELECT *
-WHERE {
-  ?project a rdfs:Resource ;
-  	rdfs:label ?label ;
-    foaf:page ?page ;
-    infai_v:startDate ?startDate ;
-    .
-  	FILTER ( ?label != "" )
-}
-*/
-async function readProjects() {
-  const project = variable('project')
-  const label = variable('label')
-  const page = variable('page')
-  const startDate = variable('startDate')
-  var query =
-    await SELECT`${project} ${label} ${page} ${startDate}`
-      .WHERE`${project} a ${rdfs.Resource} ;
-        ${rdfs.label} ${label} ;
-        ${foaf.page} ${page} ;
-        ${infai_v.startDate} ${startDate} ;
-        .
-        FILTER ( ${label} != "" )`
-      .build();
-  console.log("query: ", query)
-  var response = await executeSparqlQuery(query)
-  return response.results.bindings;
+function selectBuilder(obj) {
+  var query = ``;
+  for (var key of Object.keys(obj)) {
+    query += `?${key} `;
+  }
+
+  return query;
 }
 
-/*
-SELECT ?tool ?repositoryIRI ?repositoryURL ?label (GROUP_CONCAT(?tag; SEPARATOR=", ") as ?tags) ?aksw ?autoUpdate (GROUP_CONCAT(?project; SEPARATOR=", ") as ?projects) ?comment ?logo ?created ?modified ?documentationPage
-WHERE {
-  ?tool a rdfs:Resource ;
-  	infai_v:repository ?repositoryIRI ;
-    rdfs:label ?label ;
-    infai_v:tag ?tag ;
-    infai_v:AKSW ?aksw ;
-    infai_v:autoUpdate ?autoUpdate ;
-    infai_v:usedInProject ?project ;
-    rdfs:comment ?comment ;
-    foaf:logo ?logo ;
-    dcterms:created ?created ;
-    dcterms:modified ?modified ;
-    infai_v:documentationPage ?documentationPage ;
-    infai_v:status ?status ;
-    .
-  	FILTER ( ?label != "" )
-    ?repositoryIRI a rdfs:Resource ;
-      foaf:page ?repositoryURL ;
-    .
-}
-group by ?tool ?repositoryIRI ?repositoryURL ?label ?aksw ?autoUpdate ?comment ?logo ?created ?modified ?documentationPage
-*/
-async function readTools() {
-  const tool = variable('tool')
-  const repositoryIRI = variable('repositoryIRI')
-  const repositoryURL = variable('repositoryURL')
-  const label = variable('label')
-  const tag = variable('tag')
-  const tags = variable('tags')
-  const aksw = variable('aksw')
-  const autoUpdate = variable('autoUpdate')
-  const project = variable('project')
-  const projects = variable('projects')
-  const comment = variable('comment')
-  const logo = variable('logo')
-  const created = variable('created')
-  const modified = variable('modified')
-  const documentationPage = variable('documentationPage')
-  const status = variable('status')
-  var query =
-    await SELECT`${tool} ${repositoryIRI} ${repositoryURL} ${label} (GROUP_CONCAT(DISTINCT ${tag}; SEPARATOR=", ") as ${tags}) ${aksw} ${autoUpdate} (GROUP_CONCAT(DISTINCT ${project}; SEPARATOR=", ") as ${projects}) ${comment} ${logo} ${created} ${modified} ${documentationPage} ${status}`
-      .WHERE`${tool} a ${rdfs.Resource} ;
-        ${infai_v.repository} ${repositoryIRI} ;
-        ${rdfs.label} ${label} ;
-        ${infai_v.tag} ${tag} ;
-        ${infai_v.AKSW} ${aksw} ;
-        ${infai_v.autoUpdate} ${autoUpdate} ;
-        ${infai_v.usedInProject} ${project} ;
-        ${rdfs.comment} ${comment} ;
-        ${foaf.logo} ${logo} ;
-        ${dcterms.created} ${created} ;
-        ${dcterms.modified} ${modified} ;
-        ${infai_v.documentationPage} ${documentationPage} ;
-        .
-        ${repositoryIRI} a ${rdfs.Resource} ;
-          ${foaf.page} ${repositoryURL} ;
-          .
-        FILTER ( ${label} != "" )
-        OPTIONAL { ${tool} ${infai_v.status} ${status} ; }`
-      .GROUP().BY`${tool}) (${repositoryIRI}) (${repositoryURL}) (${label}) (${aksw}) (${autoUpdate}) (${comment}) (${logo}) (${created}) (${modified}) (${documentationPage}) (${status}`
-      .build();
-  console.log("query: ", query)
-  var response = await executeSparqlQuery(query)
-  return response.results.bindings;
+function selectWhereBuilder(obj) {
+  console.log(obj)
+
+  var ret = `?id a <${obj.constructor.__type.value}> ;\n`;
+  for (var key of Object.keys(obj)) {
+    if (key !== "id") {
+      ret += `<${obj.constructor.__predicateMap[key].value}> ?${key} ;\n`
+    }
+  }
+  return ret;
 }
 
 

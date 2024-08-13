@@ -37,6 +37,8 @@
         try {
           const data = await readResources("tools");
           console.log("Data return: ", data, "type:", typeof data);
+          const repos = await readResources("repositories");
+          console.log("repos return: ", repos, "type:", typeof repos); // TODO: repo could just have a page and then the load does not work.
           this.items = Tool.transformFromSPARQL(data); // Update the items data property with the response
         } catch (error) {
           console.error("There was an error fetching the data:", error);

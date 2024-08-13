@@ -1,40 +1,40 @@
-<http://infai.org/data/semantictoolstack/3d34706a-eea2-4cc9-9f1d-f4f36d7d1b4b>
+<https://infai.org/data/semantictoolstack/tags/3d34706a-eea2-4cc9-9f1d-f4f36d7d1b4b>
         a       <http://www.w3.org/2000/01/rdf-schema#Resource>;
         <http://www.w3.org/2000/01/rdf-schema#label>  "Computing";
         <http://infai.org/vocabs/semantictoolstack/color>  "#B05555";
         <http://infai.org/vocabs/semantictoolstack/group>  "Categories" .
 
-<http://infai.org/data/semantictoolstack/f89bd62b-631e-46da-a783-d2cd2c2affc1>
+<https://infai.org/data/semantictoolstack/tags/f89bd62b-631e-46da-a783-d2cd2c2affc1>
         a       <http://www.w3.org/2000/01/rdf-schema#Resource>;
         <http://www.w3.org/2000/01/rdf-schema#label>  "AI";
         <http://infai.org/vocabs/semantictoolstack/color>  "#30D931";
         <http://infai.org/vocabs/semantictoolstack/group>  "Categories" .
 
-<http://infai.org/data/semantictoolstack/1d014ca3-a621-452f-93aa-d5b38531dd7a>
+<https://infai.org/data/semantictoolstack/tags/1d014ca3-a621-452f-93aa-d5b38531dd7a>
         a       <http://www.w3.org/2000/01/rdf-schema#Resource>;
         <http://www.w3.org/2000/01/rdf-schema#label>  "Data handling";
         <http://infai.org/vocabs/semantictoolstack/color>  "#6B3AB7";
         <http://infai.org/vocabs/semantictoolstack/group>  "Categories" .
 
-<http://infai.org/data/semantictoolstack/cb6a30b0-db04-4390-b1c7-25a18509ce54>
+<https://infai.org/data/semantictoolstack/tags/cb6a30b0-db04-4390-b1c7-25a18509ce54>
         a       <http://www.w3.org/2000/01/rdf-schema#Resource>;
         <http://www.w3.org/2000/01/rdf-schema#label>  "Trust/Security";
         <http://infai.org/vocabs/semantictoolstack/color>  "#A28695";
         <http://infai.org/vocabs/semantictoolstack/group>  "Categories" .
 
-<http://infai.org/data/semantictoolstack/42e42384-9daf-4b83-a0cd-c6a439e02b52>
+<https://infai.org/data/semantictoolstack/tags/42e42384-9daf-4b83-a0cd-c6a439e02b52>
         a       <http://www.w3.org/2000/01/rdf-schema#Resource>;
         <http://www.w3.org/2000/01/rdf-schema#label>  "GUI";
         <http://infai.org/vocabs/semantictoolstack/color>  "#000000";
         <http://infai.org/vocabs/semantictoolstack/group>  "Categories" .
 
-<http://infai.org/data/semantictoolstack/24cc17dc-0624-42ad-8b3a-8dfea024d5ad>
+<https://infai.org/data/semantictoolstack/tags/24cc17dc-0624-42ad-8b3a-8dfea024d5ad>
         a       <http://www.w3.org/2000/01/rdf-schema#Resource>;
         <http://www.w3.org/2000/01/rdf-schema#label>  "Scientific";
         <http://infai.org/vocabs/semantictoolstack/color>  "#FFFFFF";
         <http://infai.org/vocabs/semantictoolstack/group>  "Categories" .
 
-<http://infai.org/data/semantictoolstack/e6e7634d-9f34-4469-834a-dfce873c0fb5>
+<https://infai.org/data/semantictoolstack/tags/e6e7634d-9f34-4469-834a-dfce873c0fb5>
         a       <http://www.w3.org/2000/01/rdf-schema#Resource>;
         <http://www.w3.org/2000/01/rdf-schema#label>  "Industry";
         <http://infai.org/vocabs/semantictoolstack/color>  "#EAF64B";

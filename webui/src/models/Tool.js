@@ -1,4 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
+import namespace from '@rdfjs/namespace'
+import prefixes from '@zazuko/prefixes/prefixes'
+import mynamespaces from '@/models/namespaces';
+import { getSPARQLLiteralOf } from '@/utils/sparql';
+const rdfs = namespace(prefixes.rdfs);
+const infai_v = namespace(mynamespaces["vocab"]);
+const foaf = namespace(prefixes.foaf)
+const dcterms = namespace(prefixes.dcterms)
+const dc = namespace('http://purl.org/dc/elements/1.1/')
 
 export class Tool {
   constructor(label, repositoryURL, tags, aksw, autoUpdate, projects, comment, logo, created, modified, documentationPage, id = "", repositoryIRI = "", status = "interesting") {
@@ -21,40 +30,69 @@ export class Tool {
     this.status = status;
   }
 
-  transformForSPARQL() {
-    return {
-      "tool": this.id,
-      "rdfs:label": this.label,
-      "infai_v:repository": this.repository.id,
-      "infai_v:tag": "<"+this.tags.join(">, <")+">",
-      "infai_v:AKSW": this.aksw,
-      "infai_v:autoUpdate": this.autoUpdate,
-      "infai_v:usedInProject": "<"+this.projects.join(">, <")+">",
-      "rdfs:comment": this.comment,
-      "foaf:logo": this.logo,
-      "dcterms:created": this.creted,
-      "dcterms:modified": this.modified,
-      "infai_v:documentationPage": this.documentationPage,
-      "infai_v:status": this.status || "interesting",
+  static __namespace = mynamespaces["tools"];
+
+  static __type = rdfs.Resource;
+
+  static __datatypes = {
+      "label": "literal",
+      "repository": "IRI",
+      "tags": "IRIs",
+      "aksw": "boolean",
+      "autoUpdate": "boolean",
+      "projects": "IRIs",
+      "comment": "text",
+      "logo": "IRI",
+      "created": "literal",
+      "modified": "literal",
+      "documentationPage": "IRI",
+      "status": "literal"
+  };
+
+  static __predicateMap = {
+    "label": rdfs.label,
+    "repository": infai_v.repository,
+    "tags": infai_v.tag,
+    "aksw": infai_v.AKSW,
+    "autoUpdate": infai_v.autoUpdate,
+    "projects": infai_v.usedInProject,
+    "comment": rdfs.comment,
+    "logo": foaf.logo,
+    "created": dcterms.created,
+    "modified": dcterms.modified,
+    "documentationPage": infai_v.documentationPage,
+    "status": infai_v.status
+  };
+
+  sparqlSnippet(key) {
+    const aggregates = {
+
     };
+    if (key in aggregates) {
+      return aggregates[key];
+    }
+    return getSPARQLLiteralOf(this, key, Tool.__datatypes[key]);
   }
+
+  static __select = `?id ?repositoryIRI ?repository ?label (GROUP_CONCAT(DISTINCT ?tags; SEPARATOR=", ") as ?alltags) ?aksw ?autoUpdate (GROUP_CONCAT(DISTINCT ?projects; SEPARATOR=", ") as ?allprojects) ?comment ?logo ?created ?modified ?documentationPage ?status`;
+  static __group = `?id) (?repositoryIRI) (?repository) (?label) (?aksw) (?autoUpdate) (?comment) (?logo) (?created) (?modified) (?documentationPage) (?status`;
 
   static transformFromSPARQL(response) {
     const modifiedData = response.map(item => {
       return new Tool(
         item.label.value,
-        item.repositoryURL.value,
-        item.tags.value.split(", "),
+        "", //item.repositoryURL.value,
+        item.alltags.value.split(", "),
         item.aksw.value === 'true',
         item.autoUpdate.value === 'true',
-        item.projects.value.split(", "),
+        item.allprojects.value.split(", "),
         item.comment.value,
         item.logo.value,
         item.created.value,
         item.modified.value,
         item.documentationPage.value,
-        item.tool.value,
-        item.repositoryIRI.value,
+        item.id.value,
+        item.repository.value,
         ((item.status != undefined) ? item.status.value : "interesting"),
       );
     }).sort((a, b) => a.label.localeCompare(b.label));
@@ -79,21 +117,46 @@ export class Repository {
     this.license = license;
   }
 
-  transformForSPARQL() {
-    return {
-      "repository": this.id,
-      "foaf:page": this.page,
-      "infai_v:lastCommit": this.lastCommit,
-      "dcterms:modified": this.modified,
-      "dc:description": this.description,
-      "infai_v:readme": this.readme,
-      "infai_v:mainContributor": this.mainContributorName,
-      "infai_v:mainContributorIRI": this.mainContributorIRI,
-      "infai_v:latestRelease": this.latestRelease,
-      "infai_v:language": this.language,
-      "infai_v:meta": this.meta,
-      "dcterms:license": this.license,
+  static __namespace = mynamespaces["repositories"];
+
+  static __type = rdfs.Resource;
+
+  static __datatypes = {
+      "page": "IRI",
+      "lastCommit": "literal",
+      "modified": "literal",
+      "description": "literal",
+      "readme": "text",
+      "mainContributorName": "literal",
+      "mainContributorIRI": "IRI",
+      "latestRelease": "IRI",
+      "language": "literal",
+      "meta": "literal",
+      "license": "literal"
+  };
+
+  static __predicateMap = {
+    "page": foaf.page,
+    "lastCommit": infai_v.lastCommit,
+    "modified": dcterms.modified,
+    "description": dc.description,
+    "readme": infai_v.readme,
+    "mainContributorName": infai_v.mainContributor,
+    "mainContributorIRI": infai_v.mainContributorIRI,
+    "latestRelease": infai_v.latestRelease,
+    "language": infai_v.language,
+    "meta": infai_v.meta,
+    "license": dcterms.license
+  };
+
+  sparqlSnippet(key) {
+    const aggregates = {
+
     };
+    if (key in aggregates) {
+      return aggregates[key];
+    }
+    return getSPARQLLiteralOf(this, key, Project.__datatypes[key]);
   }
 
   static transformFromSPARQL(item) {

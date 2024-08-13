@@ -117,7 +117,7 @@
         var response = "";
         if (project.id !== '')
           response = deleteResource("project", project);
-        response = createResource("project", project);
+        response = createResource(project);
 
         // handle
         if (typeof response !== typeof "string") {//should be the other way around but does not work

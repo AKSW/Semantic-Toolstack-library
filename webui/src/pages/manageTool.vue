@@ -124,7 +124,8 @@
         var response = "";
         if (tool.id !== '')
           response = deleteResource("tool", tool);
-        response = createResource("tool", tool);
+        response = createResource(tool);
+        //TODO create Repository
 
         // handle
         if (typeof response !== typeof "string") {//should be the other way around but does not work
