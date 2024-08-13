@@ -1,24 +1,13 @@
-// src/utils/helper.js
+// src/utils/sparql.js
 
-import { variable } from '@rdfjs/data-model'
-import namespace from '@rdfjs/namespace'
-import prefixes from '@zazuko/prefixes/prefixes'
 import { INSERT, SELECT, DELETE } from '@tpluscode/sparql-builder'
 import { v4 as uuidv4 } from 'uuid';
-
-// Namespaces
-const infai_v = namespace('http://infai.org/vocabs/semantictoolstack/')
-const infai_d = namespace('http://infai.org/data/semantictoolstack/')
-const foaf = namespace(prefixes.foaf)
-const dc = namespace('http://purl.org/dc/elements/1.1/')
-const dcterms = namespace(prefixes.dcterms)
-const rdfs = namespace(prefixes.rdfs)
+import { Tag } from '@/models/Tag'
+import { Project } from '@/models/Project'
+import { Tool, Repository } from '@/models/Tool'
 
 // Constants
 const endpoint = `${import.meta.env.VITE_DB_URL}/${import.meta.env.VITE_DB_DATASET}/`;
-const service = import.meta.env.VITE_SERVICE_URL;
-const delimiter = "xXXXx";
-export { delimiter };
 
 
 // Model functions
@@ -37,5 +26,172 @@ export function getSPARQLLiteralOf(obj, key, datatype) {
     case "IRIs":
       return `${"<"+obj[key].join(">, <")+">"}`;
   }
+}
+
+function insertBuilder(obj) {
+  console.log(obj)
+  const resource = obj.constructor.__namespace+uuidv4();
+
+  var ret = `<${resource}> a <${obj.constructor.__type.value}> ;\n`;
+  for (var key of Object.keys(obj)) {
+    if (key !== "id") {
+      ret += `<${obj.constructor.__predicateMap[key].value}> ${obj.sparqlSnippet(key)} ;\n`
+    }
+  }
+  return ret;
+}
+
+function selectBuilder(obj) {
+  var query = ``;
+  for (var key of Object.keys(obj)) {
+    query += `?${key} `;
+  }
+
+  return query;
+}
+
+function selectWhereBuilder(obj) {
+  console.log(obj)
+
+  var ret = `?id a <${obj.constructor.__type.value}> ;\n`;
+  for (var key of Object.keys(obj)) {
+    if (key !== "id") {
+      ret += `<${obj.constructor.__predicateMap[key].value}> ?${key} ;\n`
+    }
+  }
+  return ret;
+}
+
+// SPARQL
+
+async function executeSparqlUpdate(query) {
+  const username = import.meta.env.VITE_DB_USER;
+  const password = import.meta.env.VITE_DB_PASSWORD;
+  const authHeader = 'Basic ' + btoa(username + ':' + password);
+  const headers = {
+      "Content-Type": "application/sparql-update",
+      "Accept": "application/sparql-results+json",
+      'Authorization': authHeader
+  };
+
+  try {
+      const response = await fetch(endpoint+"update", {
+          method: "POST",
+          headers: headers,
+          body: query
+      });
+      const data = await response.text();
+      console.log("Update return: ", data, "type:", typeof data);
+      return data;
+  } catch (error) {
+      console.error("Error fetching data: ", error);
+      return error;
+  }
+}
+
+async function executeSparqlQuery(query) {
+  const headers = {
+      "Content-Type": "application/sparql-query",
+      "Accept": "application/sparql-results+json"
+  };
+
+  try {
+      const response = await fetch(endpoint+"query", {
+          method: "POST",
+          headers: headers,
+          body: query
+      });
+      const data = await response.json();
+      console.log("Query return: ", data, "type:", typeof data);
+      return data;
+  } catch (error) {
+      console.error("Error fetching data: ", error);
+      return error;
+  }
+}
+
+// CREATE
+export async function createResource(data) {
+  var query =
+    await INSERT.DATA`${insertBuilder(data)}
+      .
+    `
+      .build();
+  console.log("query: ", query)
+  var response = await executeSparqlUpdate(query)
+  return response;
+}
+
+// READ
+export async function readResources(type, id = "") {
+  var obj;
+  switch (type) {
+    case 'tags':
+      obj = new Tag();
+      break;
+    case 'projects':
+      obj = new Project();
+      break;
+    case 'tools':
+      obj = new Tool();
+      break;
+    case 'repositories':
+      obj = new Repository();
+      break;
+
+    default:
+      obj = {};
+      break;
+  }
+
+  // prepare statements
+  var myselect = obj.constructor.__select;
+  if (myselect === undefined || myselect === "")
+    myselect = selectBuilder(obj);
+  var mywhere = selectWhereBuilder(obj);
+  var filter = "";
+  if (id !== "") {
+    filter = ` FILTER( ?id = <${id}> ) `;
+  }
+
+  // build query
+  var promise = SELECT`${myselect}`
+  .WHERE`${mywhere}
+    .
+    FILTER ( ?label != "" )
+    ${filter}`;
+  var grouping = obj.constructor.__group;
+  if (grouping !== undefined || grouping === "") {
+    promise = promise.GROUP().BY`${grouping}`
+  }
+  var query = await promise.build();
+  console.log("query: ", query)
+
+  // send query
+  var response = await executeSparqlQuery(query)
+  if (id !== "") {
+    if (response.results.bindings.length < 1) {
+      console.log("read with iri ", iri, "had no result:", response.results.bindings);
+      return null;
+    }
+  }
+  return response.results.bindings;
+}
+
+// DELETE
+export async function deleteResource(data) {
+  var mywhere = selectWhereBuilder(data);
+
+  var query =
+    await DELETE`${mywhere}
+      .
+    `
+    .WHERE`${mywhere}
+      .
+      FILTER( ?id = <${data.id}> )`
+    .build();
+  console.log("update: ", query)
+  var response = await executeSparqlUpdate(query)
+  return response;
 }
 

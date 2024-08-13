@@ -43,7 +43,12 @@ export class Tag {
   // Needed?
   static transformFromSPARQL(response) {
     const modifiedData = response.map(item => {
-      return new Tag(item.label.value, item.color.value, item.group.value, item.id.value);
+      return new Tag(
+        item.label.value,
+        item.color.value,
+        item.group.value,
+        item.id.value
+      );
     }).sort((a, b) => a.label.localeCompare(b.label));
     return modifiedData;
   }

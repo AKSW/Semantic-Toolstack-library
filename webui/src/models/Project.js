@@ -42,7 +42,12 @@ export class Project {
 
   static transformFromSPARQL(response) {
     const modifiedData = response.map(item => {
-      return new Project(item.label.value, item.page.value, item.startDate.value, item.id.value);
+      return new Project(
+        item.label.value,
+        item.page.value,
+        item.startDate.value,
+        item.id.value
+      );
     }).sort((a, b) => a.label.localeCompare(b.label));
     return modifiedData;
   }

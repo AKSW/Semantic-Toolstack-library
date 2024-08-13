@@ -21,9 +21,9 @@
 </template>
 
 <script>
-  import { readResources } from '@/utils/helper';
+  import { readResources } from '@/utils/sparql';
   import { useRouteDataStore } from '@/store/app'
-  import { Tool } from '@/models/Tool'
+  import { Tool, Repository } from '@/models/Tool'
 
   export default {
     data: () => ({
@@ -37,9 +37,21 @@
         try {
           const data = await readResources("tools");
           console.log("Data return: ", data, "type:", typeof data);
-          const repos = await readResources("repositories");
-          console.log("repos return: ", repos, "type:", typeof repos); // TODO: repo could just have a page and then the load does not work.
-          this.items = Tool.transformFromSPARQL(data); // Update the items data property with the response
+          var tools = Tool.transformFromSPARQL(data); // Update the items data property with the response
+
+          // load repos and assign them
+          const data2 = await readResources("repositories", );
+          console.log("repos return: ", data2, "type:", typeof data2);
+          var repos = Repository.transformFromSPARQL(data2);
+          for (var repo of repos) {
+            var tool = tools.find((el, i) => {
+              return repo.id === el.repository.id;
+            });
+            tool.repository = repo;
+          }
+
+          this.items = tools;
+          console.log("all tools: ", this.items);
         } catch (error) {
           console.error("There was an error fetching the data:", error);
         }

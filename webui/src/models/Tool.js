@@ -15,7 +15,7 @@ export class Tool {
     this.label = label;
     var iri = repositoryIRI;
     if (!iri || iri == "")
-      iri = "http://infai.org/data/semantictoolstack/"+uuidv4();
+      iri = mynamespaces["repositories"]+uuidv4();
     this.repository = new Repository(repositoryURL, iri);
     this.tags = tags;                                 // array of iri strings
     this.aksw = aksw;                                 // boolean
@@ -66,7 +66,7 @@ export class Tool {
 
   sparqlSnippet(key) {
     const aggregates = {
-
+      "repository": `<${this.repository.id}>`
     };
     if (key in aggregates) {
       return aggregates[key];
@@ -101,7 +101,7 @@ export class Tool {
 }
 
 export class Repository {
-  constructor(page, id = "", lastCommit = "", modified = "", description = "", readme = "", mainContributorName = "", mainContributorIRI = "", latestRelease = "", language = "", meta = "", license = "") {
+  constructor(page = "", id = "", lastCommit = "", modified = "", description = "", readme = "", mainContributorName = "", mainContributorIRI = "", latestRelease = "", language = "", meta = "", license = "") {
     const now = (new Date()).toISOString().substring(0, 10);
     this.id = id;
     this.page = page;
@@ -159,22 +159,23 @@ export class Repository {
     return getSPARQLLiteralOf(this, key, Project.__datatypes[key]);
   }
 
-  static transformFromSPARQL(item) {
-    if (!item)
-      return {};
-    return new Repository(
-      item.page.value,
-      item.repo.value,
-      item.lastCommit.value,
-      item.modified.value,
-      item.description.value,
-      item.readme.value,
-      item.mainContributor.value,
-      item.mainContributorIRI.value,
-      item.latestRelease.value,
-      item.language.value,
-      item.meta.value,
-      item.license.value,
-    );
+  static transformFromSPARQL(response) {
+    const modifiedData = response.map(item => {
+      return new Repository(
+        item.page.value,
+        item.id.value,
+        item.lastCommit.value,
+        item.modified.value,
+        item.description.value,
+        item.readme.value,
+        item.mainContributor.value,
+        item.mainContributorIRI.value,
+        item.latestRelease.value,
+        item.language.value,
+        item.meta.value,
+        item.license.value,
+      );
+    });
+    return modifiedData;
   }
 }

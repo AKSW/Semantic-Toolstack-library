@@ -21,7 +21,7 @@
 </template>
 
 <script>
-  import { readResources } from '@/utils/helper';
+  import { readResources } from '@/utils/sparql';
   import { useRouteDataStore } from '@/store/app'
   import { Tag } from '@/models/Tag'
 
