@@ -53,7 +53,7 @@
 </template>
 
 <script>
-  import { createResource, deleteResource } from '@/utils/helper';
+  import { createResource, deleteResource } from '@/utils/sparql';
 
   export default {
     data: () => ({
@@ -83,7 +83,7 @@
         console.log("tag: ", tag);
         this.newTag = tag;
 
-        var response = deleteResource("tag", tag);
+        var response = deleteResource(tag);
 
         // handle
         if (typeof response !== typeof "string") {//should be the other way around but does not work
@@ -116,7 +116,7 @@
         this.newTag = tag;
         var response = "";
         if (tag.id !== '')
-          response = deleteResource("tag", tag);
+          response = deleteResource(tag);
         response = createResource(tag);
 
         // handle
