@@ -52,7 +52,7 @@ infai_tags:label2 a rdfs:Resource ;
 infai_projects:STREAM a rdfs:Resource ;
     rdfs:label "STREAM" ;
     foaf:page <https://stream-projekt.net> ;
-    infai_v:startDate "01-08-2019" ;
+    infai_v:startDate "2019-08-01" ;
     dc:description "Material data digitalization" ;
     infai_v:duration 36 ;
     infai_v:client "" ;

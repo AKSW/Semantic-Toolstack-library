@@ -9,6 +9,11 @@
         :value="item"
         @click="open(item)"
       >
+        <template v-slot:prepend>
+          <div>
+            <img :src="item.logo" alt="Logo" class="colorbox">
+          </div>
+        </template>
         <v-list-item-title>
           <a :href="item.page" target="_blank">
             {{item.label}}

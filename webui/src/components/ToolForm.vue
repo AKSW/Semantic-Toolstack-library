@@ -5,22 +5,11 @@
       label="Name"
     ></v-text-field>
 
-    <v-row>
-      <v-col cols="12" sm="8">
-        <v-text-field
-          v-model="formdata.repoURL"
-          label="Repository URL"
-          :rules="URLRule"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12" sm="4" class="d-flex align-center">
-        <v-btn small @click="showTurtle" color="primary">
-          <v-icon left>mdi-search</v-icon>
-          Show turtle of resource
-        </v-btn>
-      </v-col>
-    </v-row>
-    <sparql-overlay ref="overlay" />
+    <v-text-field
+      v-model="formdata.repoURL"
+      label="Repository URL"
+      :rules="URLRule"
+    ></v-text-field>
 
     <v-select
       v-model="formdata.status"
@@ -127,7 +116,6 @@
   import { compileTemplate } from 'vue/compiler-sfc';
   import { readResources } from '@/utils/sparql';
   import { triggerService } from '@/utils/helper';
-  import SparqlOverlay from './SparqlOverlay.vue';
 
   const statuses = ["irrelevant", "interesting", "planned to be used", "in use"];
 
@@ -185,9 +173,6 @@
         return true;
       },
     },
-    components: {
-      SparqlOverlay,
-    },
     methods: {
       getTool() {
         const store = useSelectorStore();
@@ -220,9 +205,6 @@
       async loadRepositoryDetails() {
         await triggerService(this.formdata.repoIRI);
         this.$refs.childFormRef.loadRepository();
-      },
-      showTurtle() {
-        this.$refs.overlay.fetchSparqlData(this.formdata.repoURL || this.formdata.repoIRI);
       },
       updateFormData(newData) {
         const store = useSelectorStore();
