@@ -125,7 +125,8 @@
   import { Tag } from '@/models/Tag'
   import { Project } from '@/models/Project'
   import { compileTemplate } from 'vue/compiler-sfc';
-  import { readResources, triggerService } from '@/utils/helper';
+  import { readResources } from '@/utils/sparql';
+  import { triggerService } from '@/utils/helper';
   import SparqlOverlay from './SparqlOverlay.vue';
 
   const statuses = ["irrelevant", "interesting", "planned to be used", "in use"];

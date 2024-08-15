@@ -42,12 +42,14 @@
           // load repos and assign them
           const data2 = await readResources("repositories", );
           console.log("repos return: ", data2, "type:", typeof data2);
-          var repos = Repository.transformFromSPARQL(data2);
+          var repos = Repository.transformFromSPARQL(data2);//TODO attributes like id are not set
           for (var repo of repos) {
             var tool = tools.find((el, i) => {
               return repo.id === el.repository.id;
             });
-            tool.repository = repo;
+            console.log("trying to assign repo", repo, " to tool ", tool)
+            if (tool)
+              tool.repository = repo;
           }
 
           this.items = tools;

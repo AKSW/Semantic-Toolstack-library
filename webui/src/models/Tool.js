@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import namespace from '@rdfjs/namespace'
 import prefixes from '@zazuko/prefixes/prefixes'
 import mynamespaces from '@/models/namespaces';
-import { getSPARQLLiteralOf } from '@/utils/sparql';
+import { getSPARQLLiteralOf, getResponseValue } from '@/utils/sparql';
 const rdfs = namespace(prefixes.rdfs);
 const infai_v = namespace(mynamespaces["vocab"]);
 const foaf = namespace(prefixes.foaf)
@@ -87,10 +87,10 @@ export class Tool {
         item.autoUpdate.value === 'true',
         item.allprojects.value.split(", "),
         item.comment.value,
-        item.logo.value,
+        (item.logo.value === "http://server/unset-base/") ? "" : item.logo.value,
         item.created.value,
         item.modified.value,
-        item.documentationPage.value,
+        (item.documentationPage.value === "http://server/unset-base/") ? "" : item.documentationPage.value,
         item.id.value,
         item.repository.value,
         ((item.status != undefined) ? item.status.value : "interesting"),
@@ -122,6 +122,7 @@ export class Repository {
   static __type = rdfs.Resource;
 
   static __datatypes = {
+      "id": "IRI",
       "page": "IRI",
       "lastCommit": "literal",
       "modified": "literal",
@@ -156,24 +157,26 @@ export class Repository {
     if (key in aggregates) {
       return aggregates[key];
     }
-    return getSPARQLLiteralOf(this, key, Project.__datatypes[key]);
+    return getSPARQLLiteralOf(this, key, Repository.__datatypes[key]);
   }
+
+  static __ignoreFilter = true;
 
   static transformFromSPARQL(response) {
     const modifiedData = response.map(item => {
       return new Repository(
-        item.page.value,
-        item.id.value,
-        item.lastCommit.value,
-        item.modified.value,
-        item.description.value,
-        item.readme.value,
-        item.mainContributor.value,
-        item.mainContributorIRI.value,
-        item.latestRelease.value,
-        item.language.value,
-        item.meta.value,
-        item.license.value,
+        getResponseValue(item, "page", Repository.__datatypes),
+        getResponseValue(item, "id", Repository.__datatypes),
+        getResponseValue(item, "lastCommit", Repository.__datatypes),
+        getResponseValue(item, "modified", Repository.__datatypes),
+        getResponseValue(item, "description", Repository.__datatypes),
+        getResponseValue(item, "preadmeage", Repository.__datatypes),
+        getResponseValue(item, "mainContributorName", Repository.__datatypes),
+        getResponseValue(item, "mainContributorIRI", Repository.__datatypes),
+        getResponseValue(item, "latestRelease", Repository.__datatypes),
+        getResponseValue(item, "language", Repository.__datatypes),
+        getResponseValue(item, "meta", Repository.__datatypes),
+        getResponseValue(item, "license", Repository.__datatypes)
       );
     });
     return modifiedData;

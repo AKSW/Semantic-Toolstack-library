@@ -86,7 +86,7 @@
 <script>
   import { useRouteDataStore } from '@/store/app'
   import { Repository } from '@/models/Tool'
-  import { readResourceByIRI } from '@/utils/helper';
+  import { readResources } from '@/utils/sparql';
   import { marked } from 'marked';
 
   export default {
@@ -141,9 +141,11 @@
       async loadRepository() {
         console.log("mounted RepositoryForm with id ", this.receivedValue);
         if (this.receivedValue && this.receivedValue !== "") {
-          var data = await readResourceByIRI("repository", this.receivedValue);
+          var data = await readResources("repositories", this.receivedValue);
           console.log(data);
-          this.updateFormData(Repository.transformFromSPARQL(data));
+          var repos = Repository.transformFromSPARQL(data);
+          console.log(repos);
+          this.updateFormData(repos[0]);
         }
         else
           this.updateFormData(this.initialFormData); // Initialize formdata

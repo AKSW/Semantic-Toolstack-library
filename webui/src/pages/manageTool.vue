@@ -54,7 +54,7 @@
 </template>
 
 <script>
-  import { createResource, deleteResource } from '@/utils/helper';
+  import { createResource, deleteResource } from '@/utils/sparql';
 
   export default {
     data: () => ({
@@ -90,12 +90,13 @@
         console.log("tool: ", tool);
         this.newTool = tool;
 
-        var response = deleteResource("tool", tool);
+        var response = deleteResource(tool);
 
         // handle
         if (typeof response !== typeof "string") {//should be the other way around but does not work
           this.alertType = "success";
           this.alertTitle = "Tool was deleted";
+          deleteResource(tool.repository);
         }
         else {
           this.alertType = "error";
@@ -122,10 +123,12 @@
         console.log("tool: ", tool);
         this.newTool = tool;
         var response = "";
-        if (tool.id !== '')
-          response = deleteResource("tool", tool);
+        if (tool.id !== '') {
+          response = deleteResource(tool);
+          deleteResource(tool.repository)
+        }
         response = createResource(tool);
-        //TODO create Repository
+        console.log("created tool: ", tool);
 
         // handle
         if (typeof response !== typeof "string") {//should be the other way around but does not work
@@ -133,6 +136,9 @@
           this.alertTitle = "Tool was added";
           if (tool.id !== '')
             this.alertTitle = "Tool was updated";
+
+          console.log("now creating repository: ", tool.repository);
+          createResource(tool.repository);
         }
         else {
           this.alertType = "error";

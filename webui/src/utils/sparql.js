@@ -29,10 +29,9 @@ export function getSPARQLLiteralOf(obj, key, datatype) {
 }
 
 function insertBuilder(obj) {
-  console.log(obj)
   const resource = obj.constructor.__namespace+uuidv4();
 
-  var ret = `<${resource}> a <${obj.constructor.__type.value}> ;\n`;
+  var ret = `<${obj.id || resource}> a <${obj.constructor.__type.value}> ;\n`;
   for (var key of Object.keys(obj)) {
     if (key !== "id") {
       ret += `<${obj.constructor.__predicateMap[key].value}> ${obj.sparqlSnippet(key)} ;\n`
@@ -51,7 +50,7 @@ function selectBuilder(obj) {
 }
 
 function selectWhereBuilder(obj) {
-  console.log(obj)
+  // console.log(obj)
 
   var ret = `?id a <${obj.constructor.__type.value}> ;\n`;
   for (var key of Object.keys(obj)) {
@@ -60,6 +59,20 @@ function selectWhereBuilder(obj) {
     }
   }
   return ret;
+}
+
+export function getResponseValue(item, key, datatypes) {
+  function get() {
+    if (Object.keys(item).includes(key) && Object.keys(item[key]).includes('value'))
+      return item[key].value;
+    return ""
+  };
+
+  if (datatypes[key] === 'IRI') {
+    return (get() === "http://server/unset-base/") ? "" : get()
+  }
+  else
+    return get();
 }
 
 // SPARQL
@@ -153,12 +166,16 @@ export async function readResources(type, id = "") {
   if (id !== "") {
     filter = ` FILTER( ?id = <${id}> ) `;
   }
+  var nameFilter = ` FILTER ( ?label != "" ) `;
+  if (obj.constructor.__ignoreFilter) {
+    nameFilter = "";
+  }
 
   // build query
   var promise = SELECT`${myselect}`
   .WHERE`${mywhere}
     .
-    FILTER ( ?label != "" )
+    ${nameFilter}
     ${filter}`;
   var grouping = obj.constructor.__group;
   if (grouping !== undefined || grouping === "") {
